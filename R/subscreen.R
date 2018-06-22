@@ -1,7 +1,6 @@
 #'This package allows analyzing a large number of subgroups simultaneously.
 #'The workflow for this subgroup screening is split into two parts:
-#'
-#'(i) calculation of the results for the different subgroups (\code{\link{subscreencalc}}) and
+#'(i) calculation of the results for the subgroups (\code{\link{subscreencalc}}) and
 #'(ii) visualization (\code{\link{subscreenshow}}).
 #'
 #'For the calculation of the subgroup results, a patient level dataset needs to be provided,

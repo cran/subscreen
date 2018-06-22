@@ -1,8 +1,9 @@
-0348bf932752abae4ee5e0b360135877 *DESCRIPTION
+4acd7492de9655b1e75dabaee26ecf86 *DESCRIPTION
 1800ae11e5a6f3bd21303d4df81aa3d8 *NAMESPACE
-6f64afa2d3d58cc149b489306c5384b3 *R/subscreen.R
-9f0fc74e2ba70ac2741cd3fd677f1e01 *R/subscreencalc.R
-2d3a7ba0afc5ece9f3f95a744a14a120 *R/subscreenshow.R
-d474a22603866289168f52be5531fe1f *man/subscreen-package.Rd
-6abedefac456819bb6f01a371773816e *man/subscreencalc.Rd
-e3a6bdb6f0dc144fa941f8a4db9d0afa *man/subscreenshow.Rd
+2a2057ba83fc757d1c22480bfec98476 *NEWS.md
+3e7c47ffa3c903203ae40fd5b2019290 *R/subscreen.R
+39295818bf1b032afe77a1d80af37b17 *R/subscreencalc.R
+7c6163f35a307c974de6318f1a9ebfb9 *R/subscreenshow.R
+b005e28f30b98171b8cd7035338c4c2a *man/subscreen-package.Rd
+d09022aa9506a5db6eff12c371f1deca *man/subscreencalc.Rd
+5ef957d616dec720d590932533fb6b24 *man/subscreenshow.Rd

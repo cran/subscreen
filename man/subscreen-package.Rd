@@ -5,12 +5,10 @@
 \alias{subscreen}
 \alias{subscreen-package}
 \title{This package allows analyzing a large number of subgroups simultaneously.
-The workflow for this subgroup screening is split into two parts:}
+The workflow for this subgroup screening is split into two parts:
+(i) calculation of the results for the subgroups (\code{\link{subscreencalc}}) and
+(ii) visualization (\code{\link{subscreenshow}}).}
 \description{
-(i) calculation of the results for the different subgroups (\code{\link{subscreencalc}}) and
-(ii) visualization (\code{\link{subscreenshow}}).
-}
-\details{
 For the calculation of the subgroup results, a patient level dataset needs to be provided,
 which (for each patient) contains the endpoint data, treatment assignment and all categorical
 baseline characteristics, by which the subgroups are defined.
