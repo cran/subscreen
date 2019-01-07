@@ -4,45 +4,17 @@
 \alias{subscreenshow}
 \title{(ii) Visualization}
 \usage{
-subscreenshow(scresults, host = NULL, port = NULL, ColorPoint = "white",
-  ColorClicked = "red", ColorSelected = "green", ColorParent = "orange",
-  ColorReference = "darkorange", ColorBG = "#424242",
-  ColorBGplot = "#424242", StripesBGplot = 7, ColorText = "#6b6b6b",
-  PreSelectScale = "lin", PreSelectTarget = "", PreSelectXAxis = "",
-  pickradius = 5, NiceNumbers = c(1, 1.5, 2, 4, 5, 6, 8, 10))
+subscreenshow(scresults, variable_importance = NULL, host = NULL,
+  port = NULL, NiceNumbers = c(1, 1.5, 2, 4, 5, 6, 8, 10))
 }
 \arguments{
 \item{scresults}{SubScreenResult object with results from a subscreencalc call}
 
+\item{variable_importance}{add description}
+
 \item{host}{host name or IP address for Shiny display}
 
 \item{port}{port number for Shiny display}
-
-\item{ColorPoint}{Color for the points displaying the subgroup results (defaults to white)}
-
-\item{ColorClicked}{Color of picked points (defaults to red)}
-
-\item{ColorSelected}{Color selected (filtered) subgroups (defaults to green)}
-
-\item{ColorParent}{Color of parent subgroup (defaults to orange)}
-
-\item{ColorReference}{Color of reference line (defaults to darkorange)}
-
-\item{ColorBG}{Background color of the Shiny app}
-
-\item{ColorBGplot}{Background color of the plot}
-
-\item{StripesBGplot}{Number of marks/shading switches on the x axis}
-
-\item{ColorText}{Color of the legend text}
-
-\item{PreSelectScale}{Scale of y axis "lin" or "log"}
-
-\item{PreSelectTarget}{Preselected target variable (y-axis)}
-
-\item{PreSelectXAxis}{Variable for x-axis}
-
-\item{pickradius}{radius (in pixel) for interactive selection of subgroups}
 
 \item{NiceNumbers}{list of numbers used for a 'nice' scale}
 }

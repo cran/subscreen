@@ -1,8 +1,8 @@
 Package: subscreen
 Type: Package
 Title: Systematic Screening of Study Data for Subgroup Effects
-Version: 1.0.0
-Author: Bodo Kirsch, Susanne Lippert, Thomas Schmelter, Christoph Muysers, Hermann Kulmann
+Version: 2.0.1
+Author: Bodo Kirsch, Susanne Lippert, Thomas Schmelter, Steffen Mueller, Christoph Muysers, Hermann Kulmann
 Maintainer: Bodo Kirsch <bodo.kirsch@bayer.com>
 Description: Identifying outcome relevant subgroups has now become as simple as possible! The formerly lengthy and tedious search for the needle in a haystack will be replaced by a single, comprehensive and coherent presentation.
  The central result of a subgroup screening is a diagram in which each single dot stands for a subgroup.
@@ -16,10 +16,13 @@ Description: Identifying outcome relevant subgroups has now become as simple as 
  kind of funnel. Any deviations from this funnel shape hint to conspicuous subgroups.
 License: GPL-3
 LazyData: TRUE
-Imports: utils, plyr, data.table, grDevices, graphics, shiny, DT, stats
-Suggests: parallel, survival
+Imports: utils, plyr, data.table, grDevices, graphics, shiny, DT,
+        stats, shinyjs, bsplus, jsonlite, colourpicker, dplyr,
+        randomForestSRC, V8
+Suggests: parallel, survival, knitr, rmarkdown
 NeedsCompilation: no
 RoxygenNote: 6.0.1
-Packaged: 2018-06-22 21:29:29 UTC; sgfpj
+VignetteBuilder: knitr
+Packaged: 2018-12-21 10:19:36 UTC; sgrpp
 Repository: CRAN
-Date/Publication: 2018-06-22 21:39:01 UTC
+Date/Publication: 2019-01-07 16:40:07 UTC

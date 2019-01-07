@@ -106,11 +106,12 @@ hazardratio <- function(x) {
    hr <- tryCatch(exp(coxph(Surv(time, event) ~ trt, data=x)$coefficients[[1]]),
                  warning=function(w) {NA})
 
-   data.frame(N1=N1, N2=N2, hr=hr)
+   data.frame(hr=hr, N1=N1, N2=N2)
  }
 
  # run subscreen
 
+\dontrun{
 results <- subscreencalc(data=pbcdat,
                      eval_function=hazardratio,
                      endpoints = c("time", "event"),
@@ -120,7 +121,7 @@ results <- subscreencalc(data=pbcdat,
                                "albuming", "phosg"))
 
 # visualize the results of the subgroup screening with a Shiny app
-\dontrun{subscreenshow(results, PreSelectTarge="hr", PreSelectXAxis="N1")}
+subscreenshow(results)}
 }
 \keyword{analysis}
 \keyword{subgroup}

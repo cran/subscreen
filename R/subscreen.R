@@ -2,6 +2,7 @@
 #'The workflow for this subgroup screening is split into two parts:
 #'(i) calculation of the results for the subgroups (\code{\link{subscreencalc}}) and
 #'(ii) visualization (\code{\link{subscreenshow}}).
+#'Optionally variable importance can be calculated (\code{\link{subscreenvi}}).
 #'
 #'For the calculation of the subgroup results, a patient level dataset needs to be provided,
 #'which (for each patient) contains the endpoint data, treatment assignment and all categorical
@@ -11,4 +12,4 @@
 #'e.g., visualization.
 #'In the second step these results will visualized in a Shiny based interactive graphical user interface,
 #'called Subgroup Explorer.
-"_PACKAGE"
+

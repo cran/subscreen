@@ -1,3 +1,29 @@
+#################################################################################
+##
+# Project:      Subscreen
+# Name:         Subscreenshow2_10AUG2018.R
+# Version:      2.0
+# Purpose:    
+# Author:       Steffen Mueller, 23.08.2018
+#               Adam Skubala, 04.07.2018
+#               Sebastian Voss, 24.08.2018
+# Reference:    see session info etc.
+# Validation:   A reviewer validation 
+# Reviewed by:  
+# Software:     R version, 3.4.3 (2017-11-30)
+#               RStudio version, 1.1.447 (2009-2018)
+##
+#################################################################################
+##
+# Input:        - 
+#               -
+#               -
+# Output:       - 
+#
+# Assumptions:  - 
+##
+#################################################################################
+
 #' (ii) Visualization
 #'
 #'
@@ -8,295 +34,77 @@
 #' Switch easily between different endpoint/target variables.
 #'
 #' @param scresults SubScreenResult object with results from a subscreencalc call
+#' @param variable_importance add description
 #' @param host host name or IP address for Shiny display
 #' @param port  port number for Shiny display
-#' @param ColorPoint Color for the points displaying the subgroup results (defaults to white)
-#' @param ColorClicked Color of picked points (defaults to red)
-#' @param ColorSelected Color selected (filtered) subgroups (defaults to green)
-#' @param ColorParent Color of parent subgroup (defaults to orange)
-#' @param ColorReference Color of reference line (defaults to darkorange)
-#' @param ColorBG Background color of the Shiny app
-#' @param ColorText Color of the legend text
-#' @param ColorBGplot Background color of the plot
-#' @param StripesBGplot Number of marks/shading switches on the x axis
-#' @param PreSelectScale Scale of y axis "lin" or "log"
-#' @param PreSelectTarget Preselected target variable (y-axis)
-#' @param PreSelectXAxis Variable for x-axis
-#' @param pickradius radius (in pixel) for interactive selection of subgroups
 #' @param NiceNumbers list of numbers used for a 'nice' scale
 #' @keywords subgroup analysis visualization
-#' @import graphics
+#' @import shiny
 #' @export subscreenshow
 #'
 #'
 
-subscreenshow <-  function(scresults,
-                           host            = NULL,
-                           port            = NULL,
-                           ColorPoint      = "white",
-                           ColorClicked    = "red",
-                           ColorSelected   = "green",
-                           ColorParent     = "orange",
-                           ColorReference  = "darkorange",
-                           ColorBG         = "#424242",
-                           ColorBGplot     = "#424242",
-                           StripesBGplot   = 7,
-                           ColorText       = "#6b6b6b",
-                           PreSelectScale  = "lin",
-                           PreSelectTarget = "",
-                           PreSelectXAxis  = "",
-                           pickradius      = 5,
-                           NiceNumbers     = c(1,1.5,2,4,5,6,8,10) )
-{
-  # check if Shiny can be loaded
-
-  # if more than one kernel is requested, check for availability of shiny
-    if (!requireNamespace("shiny", quietly = TRUE)) {
-      cat("Error: subscreenshow requires the package shiny to be installed")
-      stop()
-    }
 
 
-  ColorPoint1<-grDevices::adjustcolor(ColorPoint, alpha=1)
-  ColorPoint2<-grDevices::adjustcolor(ColorPoint, alpha=0.75)
-  ColorPoint3<-grDevices::adjustcolor(ColorPoint, alpha=0.5)
-  ColorPoint4<-grDevices::adjustcolor(ColorPoint, alpha=0.25)
-  ColorPoint5<-grDevices::adjustcolor(ColorPoint, alpha=0.10)
+subscreenshow <- function (scresults,
+                            variable_importance = NULL, 
+                            host = NULL, 
+                            port = NULL, 
+                            NiceNumbers = c(1, 1.5, 2, 4, 5, 6, 8, 10))
+  {
 
-  colortag <- paste("body {background-color: ", ColorBG, "; color: ", ColorText, "}", sep="")
+  ####.. warnings ####
+  if (!requireNamespace("shiny", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package shiny to be installed")
+    stop()
+  }
+  if (!requireNamespace("shinyjs", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package shinyjs to be installed")
+    stop()
+  }
+  if (!requireNamespace("bsplus", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package bsplus to be installed")
+    stop()
+  }
+  if (!requireNamespace("V8", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package V8 to be installed")
+    stop()
+  }
+  if (!requireNamespace("jsonlite", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package jsonlite to be installed")
+    stop()
+  }
+  if (!requireNamespace("colourpicker", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package colourpicker to be installed")
+    stop()
+  }
+  if (!requireNamespace("DT", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package DT to be installed")
+    stop()
+  }
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    cat("Error: subscreenshow requires the package dplyr to be installed")
+    stop()
+  }
+  
+  appDir <- system.file("shiny-app", "subscreen",  "app.R", package = "subscreen")
+  if (appDir == "") {
+    stop("Could not find Shiny app directory. Please try to re-install `subscreen`.", call. = FALSE)
+  }
+  
+  
+  apppars <- list(scresults=scresults, variable_importance=variable_importance, NiceNumbers=NiceNumbers)
+  
+  ui <- server <- NULL
+  
+  source(appDir, local=TRUE)
+  server_env <- environment(server)
+  
+  server_env$apppars <- apppars
+  
+  app <- shiny::shinyApp(ui, server)
+  
+  shiny::runApp(app, display.mode = "normal", host=host, port=port) 
 
-  ColorBGplotlight <- grDevices::adjustcolor(ColorBGplot, red.f=1.3, green.f=1.3, blue.f=1.3)
-
-  SGEApp <- shiny::shinyApp(
-    ui=shiny::fluidPage(
-      list(shiny::tags$head(shiny::tags$style(colortag))),
-      shiny::tags$head(
-        shiny::tags$style(shiny::HTML(".selectize-input.input-active, .selectize-input.input-active:hover, .selectize-control.multi .selectize-input.focus {border-color: red !important;}
-                                      .selectize-dropdown .active {background: yellow !important;}"))),
-
-      shiny::titlePanel("Subgroup Explorer"),
-      #      title = "Subgroup Screening",
-
-      shiny::fluidRow(
-        shiny::column(3,
-                      shiny::selectInput('y', 'Target variable (Y-Axis)', names(scresults$results_total), selected=c(PreSelectTarget,names(scresults$results_total)[6])[1]),
-                      shiny::selectInput('x', 'Reference variable (X-Axis)', names(scresults$results_total), selected=c(PreSelectXAxis, names(scresults$results_total)[3])[1]),
-                      shiny::selectInput('filter', 'Subgroup Filter', c("no selection", scresults$factors), selected="no selection"),
-                      shiny::conditionalPanel("input.filter != 'no selection'",
-                                              shiny::uiOutput("choose_value"),
-                                              selectize = FALSE
-                      ),
-
-
-                      shiny::sliderInput('key', 'Subgroup levels',
-                                         min = scresults$min_comb, max = scresults$max_comb, value = c(scresults$min_comb, scresults$min_comb), step = 1),
-                      shiny::radioButtons("plot_type", "Plot type",
-                                          c("linear"="lin", "logarithmic"="log"), selected = PreSelectScale, inline = TRUE),
-
-#                      shiny::uiOutput("RefLine"),
-                      shiny::uiOutput("YRange")
-
-
-        ),
-        shiny::column(9, shiny::plotOutput("graph", click = "plot_click", height = 700, width = 900))
-      ),
-      shiny::fluidRow(
-        shiny::column(12,
-                      shiny::tabsetPanel(type = "tabs",
-                                         shiny::tabPanel('Selected Subgroups',   DT::dataTableOutput('selectedSG')),
-                                         #                             tabPanel('Parent Subgroups',     DT::dataTableOutput('parentSG')),
-                                         shiny::tabPanel('Filtered Subgroups',   DT::dataTableOutput('filteredSG'))
-
-                      )
-
-
-        )
-      )
-        ),
-
-    server = function(input, output, session) {
-      # Starting data
-      #      hover_points_data <- data.frame(x = 5, y = 5)
-      click_points_data <- data.frame(x = numeric(), y = numeric())
-      select_points_data <- data.frame(x = numeric(), y = numeric(), SGID = numeric())
-      #      plot_points_data  <- data.frame(x = numeric(), y = numeric(), i = numeric())
-      sel_SG <- data.frame(Selected="None")
-      color <- rep(ColorPoint, 10)
-
-      shiny::makeReactiveBinding('color')
-
-
-      setcolor <- function(){
-        f <- scresults$sge[which(scresults$sge$nfactors>=input$key[1] & scresults$sge$nfactors<=input$key[2]), ]
-#        f$colour <- as.character(c(ColorPoint1, ColorPoint2, ColorPoint3, ColorPoint4, ColorPoint5))[ match(f$nfactors, 1:5 ) ]
-        # TODO: think of defining ColorPoint6-8
-        f$colour <- as.character(c(ColorPoint1, ColorPoint2, ColorPoint3, ColorPoint4, ColorPoint5, ColorPoint5, ColorPoint5, ColorPoint5))[ match(f$nfactors, 1:8 ) ]
-        if(input$filter != 'no selection') {
-          f$colour[f$SGID %in% select_points_data$SGID] <- ColorSelected
-          f$colour[f$colour != ColorSelected] <- ColorPoint5
-        }
-        f$colour[f$SGID %in% click_points_data$SGID] <- ColorClicked
-        color <<- f$colour
-      }
-
-      # Thanks to Tommy (662787) from StackOverflow
-      roundUpNice <- function(x, nice=NiceNumbers) {
-        if(length(x) != 1) stop("'x' must be of length 1")
-        if(x>=0) 10^floor(log10(x)) * nice[[which(x <= 10^floor(log10(x)) * nice)[[1]]]]
-        else -1*(roundDownNice(-x, nice=NiceNumbers))
-      }
-      roundDownNice <- function(x, nice=NiceNumbers) {
-        if(length(x) != 1) stop("'x' must be of length 1")
-        if(x>=0) 10^floor(log10(x)) * nice[[max(which(x >= 10^floor(log10(x)) * nice))]]
-        else -1*(roundUpNice(-x, nice=NiceNumbers))
-      }
-
-      # interaction click in graph
-      shiny::observeEvent(input$plot_click, {
-        clicked <- shiny::nearPoints(scresults$sge[which(scresults$sge$nfactors>=input$key[1] & scresults$sge$nfactors<=input$key[2]), ],
-                                     input$plot_click, xvar = input$x, yvar = input$y, threshold = pickradius, maxpoints = NULL)
-        clicked <- subset(clicked, select = c("SGID", x=input$x, y=input$y, "nfactors", scresults$factors))
-        click_points_data <<- clicked[, unlist(lapply(clicked, function(x)!all(is.na(x))))]
-
-        setcolor()
-
-        output$selectedSG <- DT::renderDataTable(
-          DT::datatable(
-            click_points_data, options = list(
-              lengthMenu = list(c(6, 12, -1), c('6', '12', 'All')),
-              pageLength = 6,
-              rowCallback = DT::JS(
-                'function(row, data) {
-                // Bold cells for those >= 5 in the first column
-                if (parseFloat(data[1]) >= 15.0)
-                $("td:eq(1)", row).css("font-weight", "bold");
-      }'
-                  )
-              )
-              )
-              )
-      })
-      shiny::observeEvent(input$VarChosen, {
-        if(input$filter != 'no selection') select_points_data <<- scresults$sge[which(scresults$sge$nfactors>=input$key[1] & scresults$sge$nfactors<=input$key[2] & scresults$sge[, c(input$filter)] == input$VarChosen), ]
-        else select_points_data <<- data.frame(x = numeric(), y = numeric(), SGID = numeric())
-        setcolor()
-        output$filteredSG <- DT::renderDataTable(
-          DT::datatable(
-              subset(select_points_data, select = c(x=input$x, y=input$y, "nfactors", scresults$factors)),
-              options = list(
-              lengthMenu = list(c(6, 12, -1), c('6', '12', 'All')),
-              pageLength = 6
-            )
-          )
-        )
-
-      })
-
-      shiny::observeEvent(input$key, {
-        setcolor()
-      })
-
-      output$choose_value <- shiny::renderUI({
-        if(input$filter != 'no selection') shiny::tagList(
-          shiny::selectInput("VarChosen", "Choose a value", choices=as.character(unique(stats::na.omit(scresults$sge[,c(input$filter)]))))
-        )
-      })
-
-#      output$RefLine <- shiny::renderUI({
-#        shiny::tagList(
-#          shiny::sliderInput('yc', 'Reference line', min = roundDownNice(min(scresults$sge[,c(input$y)],na.rm = TRUE)), max = roundUpNice(max(scresults$sge[,c(input$y)],na.rm = TRUE)),
-#                             value = scresults$results_total[,c(input$y)],
-#                             step  = roundUpNice((max(scresults$sge[,c(input$y)],na.rm = TRUE)-min(scresults$sge[,c(input$y)],na.rm = TRUE))/100) )
-#        )
-#      })
-
-      output$YRange <- shiny::renderUI({
-        shiny::tagList(
-          shiny::sliderInput('yrange', 'Y Range', min = roundDownNice(min(scresults$sge[,c(input$y)],na.rm = TRUE)), max = roundUpNice(max(scresults$sge[,c(input$y)],na.rm = TRUE)),
-                             value = c(min, max),
-                             step  = roundUpNice((max(scresults$sge[,c(input$y)],na.rm = TRUE)-min(scresults$sge[,c(input$y)],na.rm = TRUE))/100))
-        )
-      })
-
-      plot_points_data <- shiny::reactive({
-        data.frame(x=scresults$sge[,c(input$x)][scresults$sge$nfactors>=input$key[1] & scresults$sge$nfactors<=input$key[2]],
-                   y=scresults$sge[,c(input$y)][scresults$sge$nfactors>=input$key[1] & scresults$sge$nfactors<=input$key[2]])
-      })
-
-      SG_tit <- shiny::reactive({
-        if (input$key[1]==input$key[2]) paste(input$key[1],"-Factorial Subgroups (",length(plot_points_data()$x),")",sep="")
-        else      paste(input$key[1], " to ", input$key[2],"-Factorial Subgroups (",length(plot_points_data()$x),")",sep="")
-      })
-
-      ref_line <- shiny::reactive({
-        # input$yc - formely reactive slider input
-        scresults$results_total[,c(input$y)]
-      })
-
-      log_type <- shiny::reactive({
-        ifelse(input$plot_type=="log", "y", "")
-      })
-
-      output$graph <- shiny::renderPlot({
-
-        par(oma=c(0, 0, 0, 0), mar=c(0, 3, 0, 0), bg = ColorBGplot)
-        plot(plot_points_data(), xlab="", ylab="", ylim = input$yrange, log=log_type(), cex.axis=1.5, cex.lab=1.5, type="n", bg = ColorBGplot)
-
-        if (log_type()=="y") {
-          miniy <- 10^par("usr")[3]
-          maxiy <- 10^par("usr")[4]
-          lowy  <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/40)
-          lowyp <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/20)
-          minplustinyy <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/1400)
-
-        } else {
-          miniy <- par("usr")[3]
-          maxiy <- par("usr")[4]
-          lowy  <- miniy+ (maxiy - miniy)/40
-          lowyp <- miniy+ (maxiy - miniy)/20
-          minplustinyy <- miniy+ (maxiy - miniy)/1400
-        }
-
-        minix <- roundDownNice(par("usr")[1])
-        maxix <- roundUpNice(par("usr")[2])
-        stepx <- roundUpNice((maxix-minix)/(StripesBGplot+1))
-        # if origin of x-axis would be close to zero then set origin to zero
-        if (minix<stepx) minix <- 0
-
-        # calculate positions for background stripes and x-axis scale marks
-        stripesx <- 0:(StripesBGplot+1)
-        stripesx <- lapply(stripesx, function(x) x*stepx)
-        stripesx <- lapply(stripesx, function(x) x+minix)
-        # percentage scale
-        stripesxp <- lapply(stripesx, function(x) paste(floor(x/scresults$results_total[,c(input$x)]*100),"%") )
-
-        # draw background stripes as boxes with ligth color
-        for (i in seq(1, StripesBGplot, 2)) rect(stripesx[i],miniy,stripesx[i+1],maxiy,col = ColorBGplotlight, border = NA)
-        # x-axis original value scale and percentage scale
-        text(stripesx, lowy, stripesx, cex = 1.5)
-        text(stripesx, lowyp, stripesxp, cex = 1.5)
-
-        abline(h=minplustinyy,col="black")
-        abline(h=maxiy,col="black")
-
-        if (log_type()=="y") abline(h=1, col="black")
-        else abline(h=0,col="black")
-        title(main=SG_tit(), line=-2, col="#8b8b8b")
-        points(plot_points_data(), pch=19, cex=1, col = color)
-        abline(h=ref_line(), lwd=3, col=ColorReference)
-
-      }, bg = ColorBGplot)
-
-      output$parentSG <- DT::renderDataTable(
-        DT::datatable(
-          click_points_data, options = list(
-            lengthMenu = list(c(6, 12, -1), c('6', '12', 'All')),
-            pageLength = 6
-          )
-        )
-      )
-
-
-      })
-  shiny::runApp(SGEApp, host=host, port=port)
 }
+

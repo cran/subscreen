@@ -2,4 +2,8 @@
 
 export(subscreencalc)
 export(subscreenshow)
-import(graphics)
+export(subscreenvi)
+import(plyr)
+import(randomForestSRC)
+import(shiny)
+import(stats)

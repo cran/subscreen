@@ -86,11 +86,12 @@
 #'    hr <- tryCatch(exp(coxph(Surv(time, event) ~ trt, data=x)$coefficients[[1]]),
 #'                  warning=function(w) {NA})
 #'
-#'    data.frame(N1=N1, N2=N2, hr=hr)
+#'    data.frame(hr=hr, N1=N1, N2=N2)
 #'  }
 #'
 #'  # run subscreen
 #'
+#' \dontrun{
 #' results <- subscreencalc(data=pbcdat,
 #'                      eval_function=hazardratio,
 #'                      endpoints = c("time", "event"),
@@ -100,214 +101,178 @@
 #'                                "albuming", "phosg"))
 #'
 #' # visualize the results of the subgroup screening with a Shiny app
-#' \dontrun{subscreenshow(results, PreSelectTarge="hr", PreSelectXAxis="N1")}
+#' subscreenshow(results)}
 
-
-subscreencalc <- function(data,
-                      eval_function,
-                      endpoints,
-                      treat="trtp",
-                      subjectid="subjid",
-                      factors=NULL,
-                      min_comb=1,
-                      max_comb=3,
-                      nkernel=1,
-                      par_functions="",
-                      verbose=T) {
-
-  # checks for parameters
-  if (!is.data.frame(data)) { stop("Error! subscreen: data has to be a dataframe")}
-
-  if (!is.function(eval_function)) { stop("Error! subscreen: eval_function has to be a function")}
-
-  if ( !is.null(treat) && (!treat == "") && !(treat %in% names(data))) { stop("Error! subscreen: specified treatment variable not in dataframe")}
-
-  if (!(subjectid %in% names(data))) {stop("Error! subscreen: specified subject variable not in dataframe")}
-
-  if (!is.numeric(min_comb)) {stop("Error! subscreen: min_comb has to be a number")}
-
-  if (!is.numeric(max_comb)) {stop("Error! subscreen: max_comb has to be a number")}
-
-  if (!is.null(factors) && (length(factors) != sum(factors %in% names(data)))) {
+subscreencalc <- function (data, 
+                            eval_function, 
+                            endpoints, 
+                            treat = "trtp", 
+                            subjectid = "subjid", 
+                            factors = NULL, 
+                            min_comb = 1, 
+                            max_comb = 3, 
+                            nkernel = 1, 
+                            par_functions = "", 
+                            verbose = T) 
+{
+  if (!is.data.frame(data)) {
+    stop("Error! subscreen: data has to be a dataframe")
+  }
+  if (!is.function(eval_function)) {
+    stop("Error! subscreen: eval_function has to be a function")
+  }
+  if (!is.null(treat) && (!treat == "") && !(treat %in% names(data))) {
+    stop("Error! subscreen: specified treatment variable not in dataframe")
+  }
+  if (!(subjectid %in% names(data))) {
+    stop("Error! subscreen: specified subject variable not in dataframe")
+  }
+  if (!is.numeric(min_comb)) {
+    stop("Error! subscreen: min_comb has to be a number")
+  }
+  if (!is.numeric(max_comb)) {
+    stop("Error! subscreen: max_comb has to be a number")
+  }
+  if (!is.null(factors) && (length(factors) != sum(factors %in% 
+                                                   names(data)))) {
     for (item in factors) {
-      if (!(item %in% names(data))) {stop("Error! subscreen: not all variables in factors included in data")}
+      if (!(item %in% names(data))) {
+        stop("Error! subscreen: not all variables in factors included in data")
+      }
     }
   }
-
-  #   if more than one kernel is requested, check for availability of parallel
   if (nkernel > 1) {
     if (!requireNamespace("parallel", quietly = TRUE)) {
       cat("Warning: Use of more than one kernel requires package parallel to be installed. \n nkernel set to 1 \n")
     }
   }
-
-
-  #######################################################################################
-  ### Subgroup generation                                                             ###
-  #######################################################################################
-
-
-  createCombinationMatrix <- function(n,k,l){
-    ### calculating all possible factor combination
-    ### n - total number of factors to choose from
-    ### k - minimum number of factors to choose
-    ### l - maximum number of factors to choose
-    ### result - Matrix with n columns (one per factor)
-    ### called in main program
-    t(do.call(cbind, lapply(k:l, function(x) utils::combn(n,x,tabulate,nbins=n))))
+  createCombinationMatrix <- function(n, k, l) {
+    t(do.call(cbind, lapply(k:l, function(x) utils::combn(n, 
+                                                          x, tabulate, nbins = n))))
   }
-
-
-
-  sugruCount <- function(M,StAn){
-    ### Calculates the number of subgroups for each row in M
-    ### called in main program
-    return(apply(M,1,function(x) {x=x*StAn; prod(x[x!=0])}))
+  sugruCount <- function(M, StAn) {
+    return(apply(M, 1, function(x) {
+      x = x * StAn
+      prod(x[x != 0])
+    }))
   }
-
-
-  sugruCalc <- function(i){
-    ### generates all subgroup analyses for a given row m in M
-    m=M[i,]
-    S=character();
-    S=append(S,names(FFF)[(1:length(m))*m])
-    d=plyr::ddply(cbind(FFF,TTT),S,eval_function)
-    nfactors=sum(m)
-    h=cbind(nfactors,d)
+  sugruCalc <- function(i) {
+    m = M[i, ]
+    S = character()
+    S = append(S, names(FFF)[(1:length(m)) * m])
+    d = plyr::ddply(cbind(FFF, TTT), S, eval_function)
+    
+    ## SMR 17.07. :
+    d_N <- plyr::ddply(cbind(FFF,TTT),S,function(x){N.of.subjects <- sum(!is.na(x[subjectid]))
+    data.frame(N.of.subjects)})
+    d <- merge(d,d_N)
+    ##
+    
+    nfactors = sum(m)
+    h = cbind(nfactors, d)
     return(h)
   }
-
-
-
-  combineDataFrame <- function(h, version=2){
-    ### combines the data frames in list h
-    ### to the data frame H and fills the missing columns
-
-    ### Set order of the columns: results, "nfactors", factors
-    if (version==1) {
-      hf=c("nfactors",names(FFF))
-      ha=names(h[[1]]); for (i in 2:dim(M)[1]) ha=union(ha,names(h[[i]]))
-      ht=setdiff(ha,hf)
-      hn=union(ht,hf)
-
-      for (i in 1:dim(M)[1]){
-        for(j in hn){
-          if (sum(j == names(h[[i]])) == 0){
-            h[[i]][j]=rep(NA,dim(h[[i]])[1])
+  combineDataFrame <- function(h, version = 2) {
+    if (version == 1) {
+      hf = c("nfactors", names(FFF))
+      ha = names(h[[1]])
+      for (i in 2:dim(M)[1]) ha = union(ha, names(h[[i]]))
+      ht = setdiff(ha, hf)
+      hn = union(ht, hf)
+      for (i in 1:dim(M)[1]) {
+        for (j in hn) {
+          if (sum(j == names(h[[i]])) == 0) {
+            h[[i]][j] = rep(NA, dim(h[[i]])[1])
           }
         }
       }
-
-      H=h[[1]]
-      for (i in 2:dim(M)[1]){
-        H=rbind(H,h[[i]])
+      H = h[[1]]
+      for (i in 2:dim(M)[1]) {
+        H = rbind(H, h[[i]])
       }
     }
-
-    if (version==2) {
-      H=as.data.frame(data.table::rbindlist(h, use.names=TRUE, fill=TRUE))
+    if (version == 2) {
+      H = as.data.frame(data.table::rbindlist(h, use.names = TRUE, 
+                                              fill = TRUE))
+      
+      ## SMR:
+      ## TS changed
+      for (fac in factors) {
+        H[[fac]] <- addNA(H[[fac]])
+        levels(H[[fac]])[is.na(levels(H[[fac]]))] <- "Not used"
+      }
+      ##
+      
     }
-    if (version==3) {
-      H=do.call("rbind", h)
+    if (version == 3) {
+      H = do.call("rbind", h)
     }
-    ### identification variable for the subgroup SGID
-    SGID=1:dim(H)[1]
-    return(cbind(SGID,H))
+    SGID = 1:dim(H)[1]
+    return(cbind(SGID, H))
   }
-
-
-### import data
-
-
-
-### separate data
-### Treatment, target variables and subject-id
-TTT=data[, (colnames(data) %in% c(subjectid, treat, endpoints))]
-
-### subgroup defining factors (as listed or everything excluding what's in TTT)
-if (is.null(factors)) {
-  FFF=data[, !(colnames(data) %in% c(subjectid, treat, endpoints))]
-  factors <- names(FFF)
-} else {
-  FFF=data[, (colnames(data) %in% factors)]
+  
+  TTT = data[, (colnames(data) %in% c(subjectid, treat, endpoints))]
+  if (is.null(factors)) {
+    FFF = data[, !(colnames(data) %in% c(subjectid, treat, 
+                                         endpoints))]
+    factors <- names(FFF)
+  }
+  else {
+    FFF = data[, (colnames(data) %in% factors)]
+  }
+  AnFa = dim(FFF)[2]
+  AaS = dim(data)[1]
+  StAn = apply(FFF, 2, function(x) length(table(x)))
+  pt0 <- proc.time()
+  M = createCombinationMatrix(AnFa, min_comb, max_comb)
+  AnSu = sugruCount(M, StAn)
+  pt1 <- proc.time()
+  rowsM = dim(M)[1]
+  if (nkernel > 1) {
+    clus = parallel::makeCluster(nkernel)
+    parallel::clusterExport(clus, c("FFF", "TTT", "M", "AaS", 
+                                    "eval_function"), environment())
+    parallel::clusterExport(clus, c("ddply"), environment(plyr::ddply))
+    if (par_functions != "") 
+      parallel::clusterExport(clus, par_functions)
+    h <- parallel::parLapplyLB(cl = clus, 1:rowsM, sugruCalc)
+    parallel::stopCluster(clus)
+  }
+  else {
+    h <- sapply(1:rowsM, sugruCalc, simplify = FALSE)
+  }
+  pt2 <- proc.time()
+  H = combineDataFrame(h)
+  pt3 <- proc.time()
+  z = numeric()
+  for (i in 1:length(h)) z[i] = dim(h[[i]])[1]
+  if (verbose == T) {
+    cat("\n", "Number of Subjects                     ", 
+        AaS, "\n", "Number of Subgroup Factors             ", 
+        AnFa, "\n", "Potential Subgroups                    ", 
+        sum(AnSu), "\n", "Non-existent/empty Subgroups           ", 
+        sum(AnSu - z), "\n", "Existent Subgroups                     ", 
+        sum(z), "\n\n", "Time for SG Analyses (s)               ", 
+        pt2 - pt1, "\n", "Time for creating Data Frames (s)      ", 
+        pt3 - pt2, "\n", "Overall time used (HH:MM:SS)           ", 
+        paste(((pt3 - pt0)[3]/3600)%/%1, (((pt3 - pt0)[3]/60)%/%1)%%60, 
+              round((pt3 - pt0)[3]%%60, digits = 4), sep = ":"), 
+        "\n")
+  }
+  
+  
+  #SMR: 17.07:
+  evfu<-eval_function(cbind(FFF,TTT))
+  N <- data.frame('N.of.subjects'=sum(!is.na(cbind(TTT,FFF)[subjectid])))
+  res <- merge(evfu,N) 
+  ##End SMR
+  
+  H <- list(sge = H, max_comb = max_comb, min_comb = min_comb, 
+            subjectid = subjectid, endpoints = endpoints, treat = treat,   ## SMR 17.07: add N.of.subjects to endpoints
+            factors = factors, results_total = res)
+  class(H) <- "SubScreenResult"
+  H
 }
 
 
-### number of factors and subjects
-    AnFa= dim(FFF)[2]  ### number of factors
-    AaS = dim(data)[1] ### number of subjects
-
-### number of factor levels for each factor
-    StAn=apply(FFF,2,function(x)length(table(x)))
-
-
-
-### analysis function "eval_function" to be filled in with the statistical evaluation
-
-
-
-
-            pt0 <- proc.time() #preparation time
-
-            ### create all possible factor combinations and get number
-            M=createCombinationMatrix(AnFa,min_comb,max_comb)
-            AnSu=sugruCount(M,StAn)
-
-            pt1 <- proc.time() #start time
-            rowsM=dim(M)[1]
-
-            if (nkernel > 1) {
-              ### parallel evaluation of subgroup analyses
-              clus=parallel::makeCluster(nkernel)
-              #print(environment())
-              parallel::clusterExport(clus, c("FFF", "TTT", "M", "AaS", "eval_function"), environment())
-              parallel::clusterExport(clus, c("ddply"), environment(plyr::ddply))
-              if (par_functions!="") parallel::clusterExport(clus, par_functions)
-              h <- parallel::parLapplyLB(cl=clus, 1:rowsM,sugruCalc)
-              parallel::stopCluster(clus)
-            } else {
-              # turn off simplify to avoid error if max_comb=1
-              h <- sapply(1:rowsM, sugruCalc, simplify = FALSE)
-            }
-
-            pt2 <- proc.time() #time 2
-
-            ### create data frames from lists
-
-            H=combineDataFrame(h)
-
-            pt3 <- proc.time() #stop time
-
-            ### elements of z are the existent subgroups
-            ### elements of z are smaller as
-            ### elements of AnSu, if factor combinations don't exist
-
-            z=numeric(); for (i in 1:length(h)) z[i]=dim(h[[i]])[1]
-
-            if (verbose == T) {
-            ### report creation
-            cat("\n","Number of Subjects                     ",AaS,          "\n",
-                     "Number of Subgroup Factors             ",AnFa,         "\n",
-                     "Potential Subgroups                    ",sum(AnSu),    "\n",
-                     "Non-existent/empty Subgroups           ",sum(AnSu-z),  "\n",
-                     "Existent Subgroups                     ",sum(z),       "\n\n",
-                     "Time for SG Analyses (s)               ",pt2-pt1,      "\n",
-                     "Time for creating Data Frames (s)      ",pt3-pt2,      "\n",
-                     "Overall time used (HH:MM:SS)           ",paste( ((pt3-pt0)[3]/3600)%/%1, (((pt3-pt0)[3]/60)%/%1)%%60, round((pt3-pt0)[3]%%60, digits=4), sep=":"), "\n"
-            )
-            }
-
-
-            H <- list(sge=H,
-                      max_comb=max_comb,
-                      min_comb=min_comb,
-                      subjectid=subjectid,
-                      endpoints=endpoints,
-                      treat=treat,
-                      factors=factors,
-                      results_total=eval_function(cbind(FFF,TTT)))
-
-            class(H) <- "SubScreenResult"
-            H
-}
 
