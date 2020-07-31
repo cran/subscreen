@@ -4,9 +4,21 @@
 \alias{subscreencalc}
 \title{(i) Calculation of the results for the subgroups}
 \usage{
-subscreencalc(data, eval_function, endpoints, treat = "trtp",
-  subjectid = "subjid", factors = NULL, min_comb = 1, max_comb = 3,
-  nkernel = 1, par_functions = "", verbose = T)
+subscreencalc(
+  data,
+  eval_function,
+  endpoints,
+  treat = "trtp",
+  subjectid = "subjid",
+  factors = NULL,
+  min_comb = 1,
+  max_comb = 3,
+  nkernel = 1,
+  par_functions = "",
+  verbose = TRUE,
+  factorial = FALSE,
+  use_complement = FALSE
+)
 }
 \arguments{
 \item{data}{dataframe with study data}
@@ -30,6 +42,10 @@ subscreencalc(data, eval_function, endpoints, treat = "trtp",
 \item{par_functions}{vector of names of functions used in eval_function to be exported to cluster (needed only if nkernel > 1)}
 
 \item{verbose}{switch on/off output of computational information}
+
+\item{factorial}{switch on/off calculation of factorial contexts}
+
+\item{use_complement}{switch on/off calculation of complement subgroups}
 }
 \value{
 an object of type SubScreenResult of the form
@@ -64,7 +80,6 @@ that is expected to be between 0.5 and 2 I would set all values smaller than 0.0
 # get the pbc data from the survival package
 require(survival)
 data(pbc, package="survival")
-
 # generate categorical versions of some of the baseline covariates
 pbc$ageg[!is.na(pbc$age)]        <-
    ifelse(pbc$age[!is.na(pbc$age)]          <= median(pbc$age,     na.rm=TRUE), "Low", "High")
@@ -80,7 +95,6 @@ pbc$cholg[!is.na(pbc$chol)]      <-
    ifelse(pbc$chol[!is.na(pbc$chol)]        <= median(pbc$chol,    na.rm=TRUE), "Low", "High")
 pbc$copperg[!is.na(pbc$copper)]  <-
    ifelse(pbc$copper[!is.na(pbc$copper)]    <= median(pbc$copper,  na.rm=TRUE), "Low", "High")
-
 pbc$ageg[is.na(pbc$age)]         <- "No Data"
 pbc$albuming[is.na(pbc$albumin)] <- "No Data"
 pbc$phosg[is.na(pbc$alk.phos)]   <- "No Data"
@@ -88,37 +102,53 @@ pbc$astg[is.na(pbc$ast)]         <- "No Data"
 pbc$bilig[is.na(pbc$bili)]       <- "No Data"
 pbc$cholg[is.na(pbc$chol)]       <- "No Data"
 pbc$copperg[is.na(pbc$copper)]   <- "No Data"
-# redefine censoring variable, consider transplant/death as event
-pbc$event <- pbc$status
-pbc$event[pbc$event==2] <- 1
-
+#eliminate treatment NAs
 pbcdat <- pbc[!is.na(pbc$trt), ]
-
+# PFS and OS endpoints
+set.seed(2006)
+pbcdat$'event.pfs' <- sample(c(0,1),dim(pbcdat)[1],replace=TRUE)
+pbcdat$'timepfs' <- sample(1:5000,dim(pbcdat)[1],replace=TRUE)
+pbcdat$'event.os' <- pbcdat$event
+pbcdat$'timeos' <- pbcdat$time
+#variable importance for OS for the created categorical variables
+#(higher is more important, also works for numeric variables)
+varnames <- c('ageg', 'sex', 'bilig', 'cholg', 'astg', 'albuming', 'phosg')
+results.vi <- subscreenvi(data=pbcdat, y=c('timeos','timepfs'),
+ cens='event.os', trt='trt', x=varnames)
 # define function the eval_function()
 # Attention: The eval_function ALWAYS needs to return a dataframe with one row.
 #            Include exception handling, like if(N1>0 && N2>0) hr <- exp(coxph(...) )
 #            to avoid program abort due to errors
+hazardratio <- function(D) {
 
-hazardratio <- function(x) {
-   N1 <- sum(x$trt==1)
-   N2 <- sum(x$trt==2)
-
-   hr <- tryCatch(exp(coxph(Surv(time, event) ~ trt, data=x)$coefficients[[1]]),
-                 warning=function(w) {NA})
-
-   data.frame(hr=hr, N1=N1, N2=N2)
- }
+ HRpfs <- tryCatch(exp(coxph(Surv(D$timepfs, D$event.pfs) ~ D$trt )$coefficients[[1]]),
+  warning=function(w) {NA})
+ HRpfs <- 1/HRpfs
+ HR.pfs <- round(HRpfs, 2)
+ HR.pfs[HR.pfs > 10]      <- 10
+ HR.pfs[HR.pfs < 0.00001] <- 0.00001
+ HRos <- tryCatch(exp(coxph(Surv(D$timeos, D$event.os) ~ D$trt )$coefficients[[1]]),
+  warning=function(w) {NA})
+ HRos <- 1/HRos
+ HR.os <- round(HRos, 2)
+ HR.os[HR.os > 10]      <- 10
+ HR.os[HR.os < 0.00001] <- 0.00001
+ data.frame( HR.pfs, HR.os#, N.of.subjects,N1 ,N2
+ )
+}
 
  # run subscreen
 
 \dontrun{
 results <- subscreencalc(data=pbcdat,
                      eval_function=hazardratio,
-                     endpoints = c("time", "event"),
+                     endpoints = c("timepfs" , "event.pfs", "timeos", "event.os"),
                      treat="trt",
                      subjectid = "id",
                      factors=c("ageg", "sex", "bilig", "cholg", "copperg", "astg",
-                               "albuming", "phosg"))
+                               "albuming", "phosg"),
+                     use_complement = FALSE,
+                     factorial = TRUE)
 
 # visualize the results of the subgroup screening with a Shiny app
 subscreenshow(results)}

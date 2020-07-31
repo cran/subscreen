@@ -28,6 +28,8 @@
 #' @param nkernel number of kernels for parallelization (defaults to 1)
 #' @param par_functions vector of names of functions used in eval_function to be exported to cluster (needed only if nkernel > 1)
 #' @param verbose switch on/off output of computational information
+#' @param factorial switch on/off calculation of factorial contexts
+#' @param use_complement switch on/off calculation of complement subgroups
 #' @return an object of type SubScreenResult of the form
 #' list(sge=H,
 #'      max_comb=max_comb,
@@ -43,7 +45,6 @@
 #' # get the pbc data from the survival package
 #' require(survival)
 #' data(pbc, package="survival")
-#'
 #' # generate categorical versions of some of the baseline covariates
 #' pbc$ageg[!is.na(pbc$age)]        <-
 #'    ifelse(pbc$age[!is.na(pbc$age)]          <= median(pbc$age,     na.rm=TRUE), "Low", "High")
@@ -59,7 +60,6 @@
 #'    ifelse(pbc$chol[!is.na(pbc$chol)]        <= median(pbc$chol,    na.rm=TRUE), "Low", "High")
 #' pbc$copperg[!is.na(pbc$copper)]  <-
 #'    ifelse(pbc$copper[!is.na(pbc$copper)]    <= median(pbc$copper,  na.rm=TRUE), "Low", "High")
-#'
 #' pbc$ageg[is.na(pbc$age)]         <- "No Data"
 #' pbc$albuming[is.na(pbc$albumin)] <- "No Data"
 #' pbc$phosg[is.na(pbc$alk.phos)]   <- "No Data"
@@ -67,54 +67,74 @@
 #' pbc$bilig[is.na(pbc$bili)]       <- "No Data"
 #' pbc$cholg[is.na(pbc$chol)]       <- "No Data"
 #' pbc$copperg[is.na(pbc$copper)]   <- "No Data"
-
-#' # redefine censoring variable, consider transplant/death as event
-#' pbc$event <- pbc$status
-#' pbc$event[pbc$event==2] <- 1
-#'
+#' #eliminate treatment NAs
 #' pbcdat <- pbc[!is.na(pbc$trt), ]
-#'
+#'# PFS and OS endpoints
+#' set.seed(2006)
+#' pbcdat$'event.pfs' <- sample(c(0,1),dim(pbcdat)[1],replace=TRUE)
+#' pbcdat$'timepfs' <- sample(1:5000,dim(pbcdat)[1],replace=TRUE)
+#' pbcdat$'event.os' <- pbcdat$event
+#' pbcdat$'timeos' <- pbcdat$time
+#'#variable importance for OS for the created categorical variables
+#'#(higher is more important, also works for numeric variables)
+#' varnames <- c('ageg', 'sex', 'bilig', 'cholg', 'astg', 'albuming', 'phosg')
+#' results.vi <- subscreenvi(data=pbcdat, y=c('timeos','timepfs'),
+#'  cens='event.os', trt='trt', x=varnames)
 #' # define function the eval_function()
 #' # Attention: The eval_function ALWAYS needs to return a dataframe with one row.
 #' #            Include exception handling, like if(N1>0 && N2>0) hr <- exp(coxph(...) )
 #' #            to avoid program abort due to errors
+#'hazardratio <- function(D) {
 #'
-#' hazardratio <- function(x) {
-#'    N1 <- sum(x$trt==1)
-#'    N2 <- sum(x$trt==2)
-#'
-#'    hr <- tryCatch(exp(coxph(Surv(time, event) ~ trt, data=x)$coefficients[[1]]),
-#'                  warning=function(w) {NA})
-#'
-#'    data.frame(hr=hr, N1=N1, N2=N2)
-#'  }
+#'  HRpfs <- tryCatch(exp(coxph(Surv(D$timepfs, D$event.pfs) ~ D$trt )$coefficients[[1]]),
+#'   warning=function(w) {NA})
+#'  HRpfs <- 1/HRpfs
+#'  HR.pfs <- round(HRpfs, 2)
+#'  HR.pfs[HR.pfs > 10]      <- 10
+#'  HR.pfs[HR.pfs < 0.00001] <- 0.00001
+#'  HRos <- tryCatch(exp(coxph(Surv(D$timeos, D$event.os) ~ D$trt )$coefficients[[1]]),
+#'   warning=function(w) {NA})
+#'  HRos <- 1/HRos
+#'  HR.os <- round(HRos, 2)
+#'  HR.os[HR.os > 10]      <- 10
+#'  HR.os[HR.os < 0.00001] <- 0.00001
+#'  data.frame( HR.pfs, HR.os#, N.of.subjects,N1 ,N2
+#'  )
+#'}
 #'
 #'  # run subscreen
 #'
 #' \dontrun{
 #' results <- subscreencalc(data=pbcdat,
 #'                      eval_function=hazardratio,
-#'                      endpoints = c("time", "event"),
+#'                      endpoints = c("timepfs" , "event.pfs", "timeos", "event.os"),
 #'                      treat="trt",
 #'                      subjectid = "id",
 #'                      factors=c("ageg", "sex", "bilig", "cholg", "copperg", "astg",
-#'                                "albuming", "phosg"))
+#'                                "albuming", "phosg"),
+#'                      use_complement = FALSE,
+#'                      factorial = TRUE)
 #'
 #' # visualize the results of the subgroup screening with a Shiny app
 #' subscreenshow(results)}
 
-subscreencalc <- function (data, 
-                            eval_function, 
-                            endpoints, 
-                            treat = "trtp", 
-                            subjectid = "subjid", 
-                            factors = NULL, 
-                            min_comb = 1, 
-                            max_comb = 3, 
-                            nkernel = 1, 
-                            par_functions = "", 
-                            verbose = T) 
-{
+subscreencalc <- function(
+  data,
+  eval_function,
+  endpoints,
+  treat = "trtp",
+  subjectid = "subjid",
+  factors = NULL,
+  min_comb = 1,
+  max_comb = 3,
+  nkernel = 1,
+  par_functions = "",
+  verbose = TRUE,
+  factorial = FALSE,
+  use_complement = FALSE
+  ){
+
+  #### WARNING & ERROR MESSAGES ####
   if (!is.data.frame(data)) {
     stop("Error! subscreen: data has to be a dataframe")
   }
@@ -133,7 +153,7 @@ subscreencalc <- function (data,
   if (!is.numeric(max_comb)) {
     stop("Error! subscreen: max_comb has to be a number")
   }
-  if (!is.null(factors) && (length(factors) != sum(factors %in% 
+  if (!is.null(factors) && (length(factors) != sum(factors %in%
                                                    names(data)))) {
     for (item in factors) {
       if (!(item %in% names(data))) {
@@ -146,32 +166,34 @@ subscreencalc <- function (data,
       cat("Warning: Use of more than one kernel requires package parallel to be installed. \n nkernel set to 1 \n")
     }
   }
+
+  #### FUNCTIONS ####
   createCombinationMatrix <- function(n, k, l) {
-    t(do.call(cbind, lapply(k:l, function(x) utils::combn(n, 
+    t(do.call(cbind, lapply(k:l, function(x) utils::combn(n,
                                                           x, tabulate, nbins = n))))
   }
+
   sugruCount <- function(M, StAn) {
     return(apply(M, 1, function(x) {
       x = x * StAn
       prod(x[x != 0])
     }))
   }
+
   sugruCalc <- function(i) {
     m = M[i, ]
     S = character()
     S = append(S, names(FFF)[(1:length(m)) * m])
     d = plyr::ddply(cbind(FFF, TTT), S, eval_function)
-    
-    ## SMR 17.07. :
     d_N <- plyr::ddply(cbind(FFF,TTT),S,function(x){N.of.subjects <- sum(!is.na(x[subjectid]))
     data.frame(N.of.subjects)})
     d <- merge(d,d_N)
-    ##
-    
+
     nfactors = sum(m)
     h = cbind(nfactors, d)
     return(h)
   }
+
   combineDataFrame <- function(h, version = 2) {
     if (version == 1) {
       hf = c("nfactors", names(FFF))
@@ -192,17 +214,13 @@ subscreencalc <- function (data,
       }
     }
     if (version == 2) {
-      H = as.data.frame(data.table::rbindlist(h, use.names = TRUE, 
+      H = as.data.frame(data.table::rbindlist(h, use.names = TRUE,
                                               fill = TRUE))
-      
-      ## SMR:
-      ## TS changed
+
       for (fac in factors) {
         H[[fac]] <- addNA(H[[fac]])
         levels(H[[fac]])[is.na(levels(H[[fac]]))] <- "Not used"
       }
-      ##
-      
     }
     if (version == 3) {
       H = do.call("rbind", h)
@@ -210,65 +228,186 @@ subscreencalc <- function (data,
     SGID = 1:dim(H)[1]
     return(cbind(SGID, H))
   }
-  
-  TTT = data[, (colnames(data) %in% c(subjectid, treat, endpoints))]
+
+  complementCalc <- function(i) {
+    tmp2 <- tmp[i, which(H[i, colnames(H) %in% factors] != "Not used")]
+    if(length(tmp2) == 1){
+      colnam <- colnames(tmp)[which(H[i,colnames(H) %in% factors] != "Not used")]
+      tmp4 <- data[data[,colnam] != as.character(tmp2),]
+    }else{
+      tmp3 <- data[, colnames(data) %in% colnames(tmp2)]
+      ind <- apply(apply(tmp3, 1, '==', tmp2), 2, all)
+      tmp4 <- data[!ind, ]
+    }
+    return(eval_function(tmp4))
+  }
+
+  TTT <- data[, (colnames(data) %in% c(subjectid, treat, endpoints))]
+
   if (is.null(factors)) {
-    FFF = data[, !(colnames(data) %in% c(subjectid, treat, 
+
+    FFF <- data[, !(colnames(data) %in% c(subjectid, treat,
                                          endpoints))]
     factors <- names(FFF)
+
+  }else{
+
+    FFF <- data[, (colnames(data) %in% factors)]
+
   }
-  else {
-    FFF = data[, (colnames(data) %in% factors)]
-  }
-  AnFa = dim(FFF)[2]
-  AaS = dim(data)[1]
-  StAn = apply(FFF, 2, function(x) length(table(x)))
+
+  AnFa <- dim(FFF)[2]
+  AaS <- dim(data)[1]
+  StAn <- apply(FFF, 2, function(x) length(table(x)))
   pt0 <- proc.time()
-  M = createCombinationMatrix(AnFa, min_comb, max_comb)
-  AnSu = sugruCount(M, StAn)
+  M <- createCombinationMatrix(AnFa, min_comb, max_comb)
+  AnSu <- sugruCount(M, StAn)
   pt1 <- proc.time()
-  rowsM = dim(M)[1]
+  rowsM <- dim(M)[1]
+
   if (nkernel > 1) {
-    clus = parallel::makeCluster(nkernel)
-    parallel::clusterExport(clus, c("FFF", "TTT", "M", "AaS", 
+
+    clus <- parallel::makeCluster(nkernel)
+    parallel::clusterExport(clus, c("FFF", "TTT", "M", "AaS",
                                     "eval_function"), environment())
     parallel::clusterExport(clus, c("ddply"), environment(plyr::ddply))
-    if (par_functions != "") 
+    if (par_functions != "")
       parallel::clusterExport(clus, par_functions)
     h <- parallel::parLapplyLB(cl = clus, 1:rowsM, sugruCalc)
     parallel::stopCluster(clus)
-  }
-  else {
+
+  }else {
+
     h <- sapply(1:rowsM, sugruCalc, simplify = FALSE)
+
   }
   pt2 <- proc.time()
-  H = combineDataFrame(h)
+
+  H <- combineDataFrame(h)
+
+  if(use_complement == TRUE) {
+
+    tmp <- H[,colnames(H) %in% factors]
+
+    compl <- sapply(1:dim(H)[1], complementCalc, simplify = FALSE)
+
+    Compl <- combineDataFrame(compl, version = 3)
+
+    colnames(Compl) <- paste0("Complement_", colnames(Compl))
+
+    H <- cbind(H, Compl[-1])
+  }
+
   pt3 <- proc.time()
   z = numeric()
   for (i in 1:length(h)) z[i] = dim(h[[i]])[1]
-  if (verbose == T) {
-    cat("\n", "Number of Subjects                     ", 
-        AaS, "\n", "Number of Subgroup Factors             ", 
-        AnFa, "\n", "Potential Subgroups                    ", 
-        sum(AnSu), "\n", "Non-existent/empty Subgroups           ", 
-        sum(AnSu - z), "\n", "Existent Subgroups                     ", 
-        sum(z), "\n\n", "Time for SG Analyses (s)               ", 
-        pt2 - pt1, "\n", "Time for creating Data Frames (s)      ", 
-        pt3 - pt2, "\n", "Overall time used (HH:MM:SS)           ", 
-        paste(((pt3 - pt0)[3]/3600)%/%1, (((pt3 - pt0)[3]/60)%/%1)%%60, 
-              round((pt3 - pt0)[3]%%60, digits = 4), sep = ":"), 
+  if (verbose == TRUE) {
+    cat("\n", "Number of Subjects                     ",
+        AaS, "\n", "Number of Subgroup Factors             ",
+        AnFa, "\n", "Potential Subgroups                    ",
+        sum(AnSu), "\n", "Non-existent/empty Subgroups           ",
+        sum(AnSu - z), "\n", "Existent Subgroups                     ",
+        sum(z), "\n\n", "Time for SG Analyses (s)               ",
+        pt2 - pt1, "\n", "Time for creating Data Frames (s)      ",
+        pt3 - pt2, "\n", "Overall time used (HH:MM:SS)           ",
+        paste(((pt3 - pt0)[3]/3600)%/%1, (((pt3 - pt0)[3]/60)%/%1)%%60,
+              round((pt3 - pt0)[3]%%60, digits = 4), sep = ":"),
         "\n")
   }
-  
-  
-  #SMR: 17.07:
-  evfu<-eval_function(cbind(FFF,TTT))
-  N <- data.frame('N.of.subjects'=sum(!is.na(cbind(TTT,FFF)[subjectid])))
-  res <- merge(evfu,N) 
-  ##End SMR
-  
-  H <- list(sge = H, max_comb = max_comb, min_comb = min_comb, 
-            subjectid = subjectid, endpoints = endpoints, treat = treat,   ## SMR 17.07: add N.of.subjects to endpoints
+
+  evfu <- eval_function(cbind(FFF, TTT))
+  N <- data.frame('N.of.subjects' = sum(!is.na(cbind(TTT,FFF)[subjectid])))
+  res <- merge(evfu, N)
+
+  if (factorial == TRUE) {
+
+  pseudo <- function(fc) {
+    mz <- apply(fc, 1, function(r) any(is.na(r)))
+    rc <- fc[!mz, , drop = FALSE]
+    h <- names(rc) %in% names(data)[which(colnames(data) %in% factors)]
+    fn <- names(rc)[h]
+    fl <- lapply(fn, function(n) unique(rc[, n]))
+    names(fl) <- fn
+    cc <- domain(fl)
+    h <- dim(rc) == dim(cc) && all(rc[, fn, drop = FALSE] == cc)
+    if(h) rc else NULL
+  }
+
+  domain <- function(V) {
+    i <- length(V) - 1
+    while (i > 0) {
+      lle=length(V[[i]]);
+      lri=length(V[[i+1]])
+      j=length(V)
+      while (j > i){
+        V[[j]]=rep(V[[j]],lle)
+        j=j-1
+      }
+      V[[i]]=rep(V[[i]],rep(lri,lle))
+      i=i-1
+    }
+    as.data.frame(V)
+  }
+
+  factorial_context <- function(data, response){
+
+     pos_factors <- which(colnames(data) %in% factors)
+     pos_no_factors <- which(!colnames(data) %in% factors)
+
+    i <- 1
+    j <- 1
+    k <- 1
+    l <- 1
+    p <- 1
+    data$FCID_all <- numeric(dim(data)[1])
+    data$FCID_complete <- numeric(dim(data)[1])
+    data$FCID_incomplete <- numeric(dim(data)[1])
+    data$FCID_pseudo <- numeric(dim(data)[1])
+    while (i <= nrow(data)) {
+      sg <- data[i,]
+
+      un <- data[i,pos_factors[which(data[i, pos_factors] != "Not used")], drop = FALSE]
+      nn <- data[i,pos_factors[which(data[i, pos_factors] == "Not used")], drop = FALSE]
+
+      N <- lapply(un, function(k) {h = levels(k); h[h != "Not used"]})
+      d <- domain(N)
+      rownames(nn) <- NULL
+      dd <- cbind(d,nn)
+      F. <- merge(dd, data[i:(i + nrow(dd)), ], all.x = TRUE)
+      data$FCID_all[data$SGID %in% F.$SGID] <- j
+      A <- F.[, !(colnames(F.) %in% colnames(nn))]
+      if (all(!is.na(A))) {
+        data$FCID_complete[data$SGID %in% F.$SGID] <- k
+        data$FCID_incomplete[data$SGID %in% F.$SGID] <- "Complete"
+        k <- k + 1
+      } else {
+        pse <- pseudo(A)
+        if (!is.null(pse)) {
+          data$FCID_pseudo[data$SGID %in% pse$SGID] <- p
+          p <- p + 1
+        }
+        data$FCID_complete[data$SGID %in% F.$SGID] <- "Not complete"
+        data$FCID_incomplete[data$SGID %in% F.$SGID] <- l
+
+        l <- l + 1
+      }
+      i <- i + sum(!is.na(A$SGID))
+      j <- j + 1
+    }
+
+    data$FCID_pseudo[data$FCID_pseudo == 0] <- "No Pseudo"
+
+    return(data)
+  }
+
+
+  fc <- factorial_context(H, response = colnames(H)[!colnames(H) %in% c(factors,"SGID","nfactors")])
+  } else {
+  fc <- H
+}
+
+  H <- list(sge = fc, max_comb = max_comb, min_comb = min_comb,
+            subjectid = subjectid, endpoints = endpoints, treat = treat,
             factors = factors, results_total = res)
   class(H) <- "SubScreenResult"
   H

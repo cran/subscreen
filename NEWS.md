@@ -28,7 +28,7 @@
 * Deleted unused functions and program code
 * Removed NA from the subgroup filter drop-down selection
 
-# subscreen 2.0.0
+# subscreen 2.0.1
 
 * New Layout
 * Added Subscreen Comparer
@@ -38,3 +38,68 @@
 * Added Display Options Panel
 * Added identification of parent subgroups 
 * Added option to memorize subgroups
+
+# subscreen 3.0.0
+
+## subscreencalc
+* Add parameter 'factorial' for factorial context calculations
+* Add parameter 'use_complement' for Subgroup complement calculations
+
+## subscreen.vi
+*Added possibility to calculate importance for multiple target variables
+
+## subscreenshow
+*Improve coloring running time
+*Bug fix in function parents() for descending ID's
+*Bug fix 'Infinite option'-loop
+* Add 'Factorial Contexts'-calculation
+* Add optional 'Subgroup Complement'-calculation
+* Add Subscreen ASMUS-tab
+*Add Subscreen Logo
+*Change default background color
+*Add Flexible Plot sizes
+*Add Mousehover info for all plots
+*Change Table header colour
+*Add flexible Plot Legends
+
+##Subscreen Explorer-tab
+#Variable Options-tab
+*Add logarithmic Slider 
+
+#Importance-tab
+*Add 'Select Variable'-option to select target variable
+*Bug fix importance color 
+
+#Display Options-tab
+*Add 'Adjust point brightness'-option
+*Remove 'Choose number of Stripes background'-option
+*Add 'Plotting character'-option
+
+#Colour Options
+*Add 'Colour for factorial Context'-option
+*Remove 'Choose Background Colour (Plot stripes)'-option
+*Remove 'Choose font colour'-option
+
+#Plots
+*Add interaction Plot
+
+#Tables
+*Add 'Factorial Context'-table
+*Add 'Subgroup Complement'-table
+
+##Subscreen Comparer-tab
+#Sidebarpanel
+*Remove 'Subgroup Filter'-option
+*Remove 'Subgroup level(s)'-option
+#Compare-plots
+*Add legend
+#Bubble plot
+*Add legend
+
+##Subscreen Mosaic-tab
+#Sidebarpanel
+*Add help text
+
+#Hovertable
+*Change font color for hovertable
+

@@ -4,8 +4,13 @@
 \alias{subscreenshow}
 \title{(ii) Visualization}
 \usage{
-subscreenshow(scresults, variable_importance = NULL, host = NULL,
-  port = NULL, NiceNumbers = c(1, 1.5, 2, 4, 5, 6, 8, 10))
+subscreenshow(
+  scresults,
+  variable_importance = NULL,
+  host = NULL,
+  port = NULL,
+  NiceNumbers = c(1, 1.5, 2, 4, 5, 6, 8, 10)
+)
 }
 \arguments{
 \item{scresults}{SubScreenResult object with results from a subscreencalc call}

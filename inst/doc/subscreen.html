@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="Bodo Kirsch, Susanne Lippert, Thomas Schmelter, Steffen Mueller, Christoph Muysers, Hermann Kulmann" />
+<meta name="author" content="Bodo Kirsch, Susanne Lippert, Thomas Schmelter, Steffen Jeske, Christoph Muysers, Hermann Kulmann" />
 
-<meta name="date" content="2018-12-21" />
+<meta name="date" content="2020-07-30" />
 
 <title>subscreen Package Manual</title>
 
@@ -21,7 +21,190 @@
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
 
 </head>
 
@@ -31,202 +214,36 @@
 
 
 <h1 class="title toc-ignore">subscreen Package Manual</h1>
-<h4 class="author"><em>Bodo Kirsch, Susanne Lippert, Thomas Schmelter, Steffen Mueller, Christoph Muysers, Hermann Kulmann</em></h4>
-<h4 class="date"><em>2018-12-21</em></h4>
+<h4 class="author">Bodo Kirsch, Susanne Lippert, Thomas Schmelter, Steffen Jeske, Christoph Muysers, Hermann Kulmann</h4>
+<h4 class="date">2020-07-30</h4>
 
 
 
 <p>subscreen (Subgroup Screening) has been developed to sysematically analyze data, e.g., from clinical trial, for subgroup effects and visualize the outcome for all evaluated subgroups simultanously. The visualization is done by a shiny application. Typically Shiny applications are hosted on a dedicated shiny server, but due to the sensitivity of patient data in clinical trials, which are usually protected by informed consents, the upload of this data to an external server is prohibited. Therefore we provide our tool as a stand-alone application that can be launched from any local machine on which the data is stored.</p>
-<div id="description" class="section level2">
-<h2>Description</h2>
+<div id="description" class="section level1">
+<h1>Description</h1>
+<p>Identifying outcome relevant subgroups has now become as simple as possible! The formerly lengthy and tedious search for the needle in a haystack will be replaced by a single, comprehensive and coherent presentation.</p>
+<p>The central result of a subgroup screening is a diagram in which each single dot stands for a subgroup. The diagram may show thousands of them. The position of the dot in the diagram is determined by the sample size of the subgroup and the statistical measure of the treatment effect in that subgroup. The sample size is shown on the horizontal axis while the treatment effect is displayed on the vertical axis. Furthermore, the diagram shows the line of no effect and the overall study results. For small subgroups, which are found on the left side of the plot, larger random deviations from the mean study effect are expected, while for larger subgroups only small deviations from the study mean can be expected to be chance findings. So for a study with no conspicuous subgroup effects, the dots in the figure are expected to form a kind of funnel. Any deviations from this funnel shape hint to conspicuous subgroups.</p>
 </div>
-<div id="identifying-outcome-relevant-subgroups-has-now-become-as-simple-as-possible-the-formerly" class="section level1">
-<h1>Identifying outcome relevant subgroups has now become as simple as possible! The formerly</h1>
+<div id="functionality" class="section level1">
+<h1>Functionality</h1>
+<p>Every subgroup is represented by a single dot in the plot. Subgroups may be defined by a single factor (e.g. sex=female) or by a combination of different factors (e.g. agegroup=young AND smoker=no AND right-handed=yes). Which level of detail with regard to subgroup factors should be displayed can be chosen using the slider input on the left. The drop-down combo boxes allow for switching between different endpoint (y-axis), changing the reference variable (x-axis, in general the number of subjects/observations), or selecting a specific subgroub factor and a corresponding value to be highlighted in the plot. The one-level subgroup will be the most right dot. Also all combination will be highlighted. Combinations will be shown left from this dot. The plot type can be switched between linear (standard) and logarithmic. The range of the y-axis to be displayed can be reduced to zoom in.</p>
+<p>Clicking on a dot will lead to a table display at the bottom listing all subgroups in that area (tab “Selected Subgroups”). In a second tab (“Filtered Subgroups”) subgroups chosen by the drop-down combo box will be listed.</p>
 </div>
-<div id="lengthy-and-tedious-search-for-the-needle-in-a-haystack-will-be-replaced-by-a-single-comprehensive" class="section level1">
-<h1>lengthy and tedious search for the needle in a haystack will be replaced by a single, comprehensive</h1>
+<div id="input-data-for-subsreencalc" class="section level1">
+<h1>Input Data (for subsreencalc)</h1>
+<p>The input data frame should have one row per subject/patient/observation. As columns the following are required 1. variable(s) needed to derive the endpoint/outcome/target variable(s) 2. treatment/group/reference variable (only if comparison will be performed) 3. subgroup factors, i.e. categorized baseline/demographic variables</p>
+<p>The input function eval-funtion() needs to be defined by the user. This function will calculate the endpoint(s) for each subgroup, e.g. number, rate, mean, odds ratio, hazard ratio, confidence limit, p-value, … The results will be returned as a numerical vector. Each element of the vector represents an endpoint (outcome/treatment effect/result).</p>
+<p>The output object of subsreencalc will be the input for subscreenshow.</p>
 </div>
-<div id="and-coherent-presentation." class="section level1">
-<h1>and coherent presentation.</h1>
-</div>
-<div id="the-central-result-of-a-subgroup-screening-is-a-diagram" class="section level1">
-<h1>The central result of a subgroup screening is a diagram</h1>
-</div>
-<div id="in-which-each-single-dot-stands-for-a-subgroup." class="section level1">
-<h1>in which each single dot stands for a subgroup.</h1>
-</div>
-<div id="the-diagram-may-show-thousands-of-them.-the-position" class="section level1">
-<h1>The diagram may show thousands of them. The position</h1>
-</div>
-<div id="of-the-dot-in-the-diagram-is-determined-by-the" class="section level1">
-<h1>of the dot in the diagram is determined by the</h1>
-</div>
-<div id="sample-size-of-the-subgroup-and-the-statistical-measure" class="section level1">
-<h1>sample size of the subgroup and the statistical measure</h1>
-</div>
-<div id="of-the-treatment-effect-in-that-subgroup.-the" class="section level1">
-<h1>of the treatment effect in that subgroup. The</h1>
-</div>
-<div id="sample-size-is-shown-on-the-horizontal-axis-while-the" class="section level1">
-<h1>sample size is shown on the horizontal axis while the</h1>
-</div>
-<div id="treatment-effect-is-displayed-on-the-vertical-axis.-furthermore" class="section level1">
-<h1>treatment effect is displayed on the vertical axis. Furthermore,</h1>
-</div>
-<div id="the-diagram-shows-the-line-of-no-effect-and" class="section level1">
-<h1>the diagram shows the line of no effect and</h1>
-</div>
-<div id="the-overall-study-results.-for-small-subgroups-which" class="section level1">
-<h1>the overall study results. For small subgroups, which</h1>
-</div>
-<div id="are-found-on-the-left-side-of-the-plot-larger-random" class="section level1">
-<h1>are found on the left side of the plot, larger random</h1>
-</div>
-<div id="deviations-from-the-mean-study-effect-are-expected" class="section level1">
-<h1>deviations from the mean study effect are expected,</h1>
-</div>
-<div id="while-for-larger-subgroups-only-small-deviations-from" class="section level1">
-<h1>while for larger subgroups only small deviations from</h1>
-</div>
-<div id="the-study-mean-can-be-expected-to-be-chance-findings." class="section level1">
-<h1>the study mean can be expected to be chance findings.</h1>
-</div>
-<div id="so-for-a-study-with-no-conspicuous-subgroup" class="section level1">
-<h1>So for a study with no conspicuous subgroup</h1>
-</div>
-<div id="effects-the-dots-in-the-figure-are-expected-to-form-a" class="section level1">
-<h1>effects, the dots in the figure are expected to form a</h1>
-</div>
-<div id="kind-of-funnel.-any-deviations-from-this-funnel-shape" class="section level1">
-<h1>kind of funnel. Any deviations from this funnel shape</h1>
-</div>
-<div id="hint-to-conspicuous-subgroups." class="section level1">
-<h1>hint to conspicuous subgroups.</h1>
-<div id="functionality" class="section level2">
-<h2>Functionality</h2>
-</div>
-</div>
-<div id="every-subgroup-is-represented-by-a-single-dot-in-the-plot." class="section level1">
-<h1>Every subgroup is represented by a single dot in the plot.</h1>
-</div>
-<div id="subgroups-may-be-defined-by-a-single-factor-e.g.sexfemale-or-by-a-combination" class="section level1">
-<h1>Subgroups may be defined by a single factor (e.g. sex=female) or by a combination</h1>
-</div>
-<div id="of-different-factors-e.g.agegroupyoung-and-smokerno-and-right-handedyes." class="section level1">
-<h1>of different factors (e.g. agegroup=young AND smoker=no AND right-handed=yes).</h1>
-</div>
-<div id="which-level-of-detail-with-regard-to-subgroup-factors-should-be-displayed" class="section level1">
-<h1>Which level of detail with regard to subgroup factors should be displayed</h1>
-</div>
-<div id="can-be-chosen-using-the-slider-input-on-the-left." class="section level1">
-<h1>can be chosen using the slider input on the left.</h1>
-</div>
-<div id="the-drop-down-combo-boxes-allow-for-switching-between-different-endpoint-y-axis" class="section level1">
-<h1>The drop-down combo boxes allow for switching between different endpoint (y-axis),</h1>
-</div>
-<div id="changing-the-reference-variable-x-axis-in-general-the-number-of-subjectsobservations" class="section level1">
-<h1>changing the reference variable (x-axis, in general the number of subjects/observations),</h1>
-</div>
-<div id="or-selecting-a-specific-subgroub-factor-and-a-corresponding-value-to-be-highlighted" class="section level1">
-<h1>or selecting a specific subgroub factor and a corresponding value to be highlighted</h1>
-</div>
-<div id="in-the-plot.-the-one-level-subgroup-will-be-the-most-right-dot." class="section level1">
-<h1>in the plot. The one-level subgroup will be the most right dot.</h1>
-</div>
-<div id="also-all-combination-will-be-highlighted.-combinations-will-be-shown-left-from-this-dot." class="section level1">
-<h1>Also all combination will be highlighted. Combinations will be shown left from this dot.</h1>
-</div>
-<div id="the-plot-type-can-be-switched-between-linear-standard-and-logarithmic." class="section level1">
-<h1>The plot type can be switched between linear (standard) and logarithmic.</h1>
-</div>
-<div id="the-range-of-the-y-axis-to-be-displayed-can-be-reduced-to-zoom-in." class="section level1">
-<h1>The range of the y-axis to be displayed can be reduced to zoom in.</h1>
-</div>
-<div id="section" class="section level1">
-<h1></h1>
-</div>
-<div id="clicking-on-a-dot-will-lead-to-a-table-display-at-the-bottom-listing-all-subgroups" class="section level1">
-<h1>Clicking on a dot will lead to a table display at the bottom listing all subgroups</h1>
-</div>
-<div id="in-that-area-tab-selected-subgroups." class="section level1">
-<h1>in that area (tab “Selected Subgroups”).</h1>
-</div>
-<div id="in-a-second-tab-filtered-subgroups-subgroups-chosen-by-the-drop-down-combo-box" class="section level1">
-<h1>In a second tab (“Filtered Subgroups”) subgroups chosen by the drop-down combo box</h1>
-</div>
-<div id="will-be-listed." class="section level1">
-<h1>will be listed.</h1>
-</div>
-<div id="section-1" class="section level1">
-<h1></h1>
-</div>
-<div id="section-2" class="section level1">
-<h1></h1>
-<div id="input-data-for-subsreencalc" class="section level2">
-<h2>Input Data (for subsreencalc)</h2>
-</div>
-</div>
-<div id="the-input-data-frame-should-have-one-row-per-subjectpatientobservation." class="section level1">
-<h1>The input data frame should have one row per subject/patient/observation.</h1>
-</div>
-<div id="as-columns-the-following-are-required" class="section level1">
-<h1>As columns the following are required</h1>
-</div>
-<div id="variables-needed-to-derive-the-endpointoutcometarget-variables" class="section level1">
-<h1>1. variable(s) needed to derive the endpoint/outcome/target variable(s)</h1>
-</div>
-<div id="treatmentgroupreference-variable-only-if-comparison-will-be-performed" class="section level1">
-<h1>2. treatment/group/reference variable (only if comparison will be performed)</h1>
-</div>
-<div id="subgroup-factors-i.e.categorized-baselinedemographic-variables" class="section level1">
-<h1>3. subgroup factors, i.e. categorized baseline/demographic variables</h1>
-</div>
-<div id="section-3" class="section level1">
-<h1></h1>
-</div>
-<div id="the-input-function-eval-funtion-needs-to-be-defined-by-the-user." class="section level1">
-<h1>The input function eval-funtion() needs to be defined by the user.</h1>
-</div>
-<div id="this-function-will-calculate-the-endpoints-for-each-subgroup" class="section level1">
-<h1>This function will calculate the endpoint(s) for each subgroup,</h1>
-</div>
-<div id="e.g.number-rate-mean-odds-ratio-hazard-ratio-confidence-limit-p-value" class="section level1">
-<h1>e.g. number, rate, mean, odds ratio, hazard ratio, confidence limit, p-value, …</h1>
-</div>
-<div id="the-results-will-be-returned-as-a-numerical-vector.-each-element-of-the-vector-represents" class="section level1">
-<h1>The results will be returned as a numerical vector. Each element of the vector represents</h1>
-</div>
-<div id="an-endpoint-outcometreatment-effectresult." class="section level1">
-<h1>an endpoint (outcome/treatment effect/result).</h1>
-</div>
-<div id="section-4" class="section level1">
-<h1></h1>
-</div>
-<div id="the-output-object-of-subsreencalc-will-be-the-input-for-subscreenshow." class="section level1">
-<h1>The output object of subsreencalc will be the input for subscreenshow.</h1>
-<div id="things-to-consider" class="section level2">
-<h2>Things to consider</h2>
-</div>
-</div>
-<div id="there-should-be-no-na-values-in-the-input-data-set." class="section level1">
-<h1>There should be no “NA” values in the input data set.</h1>
-</div>
-<div id="if-there-are-values-na-consider-replacing-them-by-no-data-or-a-certain-value." class="section level1">
-<h1>If there are values “NA” consider replacing them by “No data” or a certain value.</h1>
-</div>
-<div id="the-eval-function-should-include-exception-handling-for-functions-that-require" class="section level1">
-<h1>The eval-function() should include exception handling for functions that require</h1>
-</div>
-<div id="a-certain-input.-for-example-the-coxph-function-should-only-be-executed-if-there" class="section level1">
-<h1>a certain input. For example the coxph() function should only be executed if there</h1>
-</div>
-<div id="is-at-least-one-observation-in-each-treatment-arm-see-example." class="section level1">
-<h1>is at least one observation in each treatment arm (see example).</h1>
-</div>
-<div id="otherwise-program-will-abort-with-error." class="section level1">
-<h1>Otherwise program will abort with error.</h1>
+<div id="things-to-consider" class="section level1">
+<h1>Things to consider</h1>
+<p>There should be no “NA” values in the input data set. If there are values “NA” consider replacing them by “No data” or a certain value. The eval-function() should include exception handling for functions that require a certain input. For example the coxph() function should only be executed if there is at least one observation in each treatment arm (see example). Otherwise program will abort with error.</p>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

@@ -27,62 +27,63 @@
 #' }
 
 subscreenvi <- function(data, y, cens=NULL, x=NULL, trt=NULL, ...){
-  
   Importance <- NULL
   # transform character to factor
-  if(any(sapply(data, class)=='character')){
+  if(any(sapply(data, is.character))){
     data[sapply(data, is.character)] <- lapply(data[sapply(data, is.character)], factor)
   }
-  
+
   # build formula
-  if (is.null(x)) x <- setdiff(colnames(data),c(trt, y,cens))
-  
-  x.form <- paste(x, collapse='+')
-  
+  if (is.null(x)) x <- setdiff(colnames(data), c(trt, y, cens))
+
+  x.form <- paste(x, collapse = '+')
+
   if (!is.null(cens)){
-    mod.form <- paste0('Surv(',y,', ',cens,')~',x.form)
+    mod.form <- paste0('Surv(', y, ', ', cens, ')~', x.form)
   }else{
-    mod.form <- paste0(y,'~',x.form)
+    mod.form <- paste0(y, '~', x.form)
   }
   # empty list for results
-  result <- list()
-  tmp <- list()
+
+  outcome <- list()
   # fit random forest for each treatment level and save variable importance
-  
-  if (!is.null(trt)){
-    
-    trt.lev <- levels(factor(data[,trt]))
-    
-    for (i in 1:length(trt.lev)){
-      
-      fit <- rfsrc(as.formula(mod.form), data=data[data[,trt]==trt.lev[i],], importance=TRUE, ...)
-      vi <- sort(fit$importance, decreasing=TRUE)
-      res.df <- data.frame('Variable'=names(vi), 'Importance'=vi)
-      rownames(res.df) <- NULL
-      result[[paste0('VI.trt.',trt.lev[i])]] <- res.df
-      
-      res.df[,2] <- 1:nrow(res.df)
-      colnames(res.df)[2] <- paste0('rank',i)
-      tmp[[paste0('VI.trt.',trt.lev[i])]] <- res.df
-      
+  for (j in 1:length(mod.form)){
+    result <- list()
+    tmp <- list()
+    if (!is.null(trt)){
+
+      trt.lev <- levels(factor(data[, trt]))
+
+      for (i in 1:length(trt.lev)){
+
+        fit <- randomForestSRC::rfsrc(as.formula(mod.form[j]), data = data[data[, trt] == trt.lev[i], ], importance = TRUE)
+        vi <- sort(fit$importance, decreasing = TRUE)
+        res.df <- data.frame('Variable' = names(vi), 'Importance' = vi)
+        rownames(res.df) <- NULL
+        result[[paste0('VI.trt.', trt.lev[i])]] <- res.df
+
+        res.df[, 2] <- 1:nrow(res.df)
+        colnames(res.df)[2] <- paste0('rank', i)
+        tmp[[paste0('VI.trt.', trt.lev[i])]] <- res.df
+      }
     }
-    
+
     # summarize trt level results: rank variability over treatment levels
-    tmp <- join_all(tmp, by='Variable', type='full')
-    tmp$'Importance' <- apply(tmp[,-1], MARGIN=1, FUN=var)
+    tmp <- plyr::join_all(tmp, by = 'Variable', type = 'full')
+    tmp$'Importance' <- apply(tmp[,-1], MARGIN = 1, FUN = var)
     tmp <- arrange(tmp, desc(Importance))
-    result[['VI.RV.trt']] <- tmp[,c('Variable','Importance')]
-    
+    result[['VI.RV.trt']] <- tmp[, c('Variable', 'Importance')]
+
+    # fit random forest for total data set and save variable importance
+    fit <- randomForestSRC::rfsrc(as.formula(paste0(mod.form[j], '+', trt)), data = data, importance = TRUE)
+    vi <- sort(fit$importance, decreasing = TRUE)
+    res.df <- data.frame('Variable' = names(vi), 'Importance' = vi)
+    rownames(res.df) <- NULL
+    result[['VI.total']] <- res.df[res.df$Variable != trt, ]
+
+    outcome[[j]] <- result$VI.RV.trt
   }
-  
-  # fit random forest for total data set and save variable importance 
-  fit <- rfsrc(as.formula(paste0(mod.form,'+',trt)), data=data, importance=TRUE, ...)
-  vi <- sort(fit$importance, decreasing=TRUE)
-  res.df <- data.frame('Variable'=names(vi), 'Importance'=vi)
-  rownames(res.df) <- NULL
-  result[['VI.total']] <- res.df[res.df$Variable!=trt,]
-  
-  return(result)
-  
+  names(outcome) <- y
+  return(outcome)
 }
 
