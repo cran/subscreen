@@ -138,7 +138,7 @@ interaction_plot2 <- function (
 
   sg_green <- "#5cb85c"
   sg_blue <- "#3a6791"
-  f_col <- colorRamp(c(sg_blue, "gray89", sg_green))
+  f_col <- grDevices::colorRamp(c(sg_blue, "gray89", sg_green))
 
   if (y.min != "NA") {
     v_min <- y.min
@@ -175,22 +175,22 @@ interaction_plot2 <- function (
       log = plot_type
     )
 
-    rect(
-      xleft = grconvertX(0,'ndc','user') - 1000,
-      xright = grconvertX(1,'ndc','user') + 1000,
-      ybottom = grconvertY(0,'ndc','user'),
-      ytop = grconvertY(1,'ndc','user'),
+    graphics::rect(
+      xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+      xright = graphics::grconvertX(1,'ndc','user') + 1000,
+      ybottom = graphics::grconvertY(0,'ndc','user'),
+      ytop = graphics::grconvertY(1,'ndc','user'),
       border = NA,
       col = bg.col,
       xpd = TRUE
     )
 
     if (!is.null(bg.col2)) {
-      rect(
-        xleft = grconvertX(0,'npc','user'),
-        xright = grconvertX(1,'npc','user'),
-        ybottom = grconvertY(0,'npc','user') ,
-        ytop = grconvertY(1,'npc','user'),
+      graphics::rect(
+        xleft = graphics::grconvertX(0,'npc','user'),
+        xright = graphics::grconvertX(1,'npc','user'),
+        ybottom = graphics::grconvertY(0,'npc','user') ,
+        ytop = graphics::grconvertY(1,'npc','user'),
         border = NA,
         col = bg.col2,
         xpd = TRUE
@@ -228,7 +228,7 @@ interaction_plot2 <- function (
       )
     }
 
-    box(col = box.col)
+    graphics::box(col = box.col)
 
     axis(
       1,
@@ -253,7 +253,7 @@ interaction_plot2 <- function (
 
     layout(matrix(c(1, 1, 2, 2), 2, 2, byrow = TRUE), heights = c(8, 2))
 
-    data_cols <- rgb(f_col(seq(0, 1, length = length(lev1))), maxColorValue = 255)
+    data_cols <- grDevices::rgb(f_col(seq(0, 1, length = length(lev1))), maxColorValue = 255)
 
     for (i in 1:length(lev1)) {
       dat <- df_data[df_data[fac1] == lev1[i], ]
@@ -267,22 +267,22 @@ interaction_plot2 <- function (
           axes = FALSE,
           log = plot_type
         )
-        rect(
-          xleft = grconvertX(0,'ndc','user') - 1000,
-          xright = grconvertX(1,'ndc','user') + 1000,
-          ybottom = grconvertY(0,'ndc','user'),
-          ytop = grconvertY(1,'ndc','user'),
+        graphics::rect(
+          xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+          xright = graphics::grconvertX(1,'ndc','user') + 1000,
+          ybottom = graphics::grconvertY(0,'ndc','user'),
+          ytop = graphics::grconvertY(1,'ndc','user'),
           border = NA,
           col = bg.col,
           xpd = TRUE
         )
 
         if (!is.null(bg.col2)) {
-          rect(
-            xleft = grconvertX(0, 'npc', 'user'),
-            xright = grconvertX(1, 'npc', 'user'),
-            ybottom = grconvertY(0, 'npc', 'user'),
-            ytop = grconvertY(1, 'npc', 'user'),
+          graphics::rect(
+            xleft = graphics::grconvertX(0, 'npc', 'user'),
+            xright = graphics::grconvertX(1, 'npc', 'user'),
+            ybottom = graphics::grconvertY(0, 'npc', 'user'),
+            ytop = graphics::grconvertY(1, 'npc', 'user'),
             border = NA,
             col = bg.col2,
             xpd = TRUE
@@ -326,7 +326,7 @@ interaction_plot2 <- function (
       }
 
       if (i == 1) {
-        box(col = box.col)
+        graphics::box(col = box.col)
 
         axis(
           1,
@@ -351,7 +351,7 @@ interaction_plot2 <- function (
       }
     }
 
-    par(mar = c(0, 0, 0, 0))
+    graphics::par(mar = c(0, 0, 0, 0))
     plot(
       NULL,
       NULL,
@@ -360,11 +360,11 @@ interaction_plot2 <- function (
       bg = "grey",
       axes = FALSE
     )
-    rect(
-      xleft = grconvertX(0,'ndc','user') - 1000,
-      xright = grconvertX(1,'ndc','user') + 1000,
-      ybottom = grconvertY(0,'ndc','user'),
-      ytop = grconvertY(1,'ndc','user'),
+    graphics::rect(
+      xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+      xright = graphics::grconvertX(1,'ndc','user') + 1000,
+      ybottom = graphics::grconvertY(0,'ndc','user'),
+      ytop = graphics::grconvertY(1,'ndc','user'),
       border = NA,
       col = bg.col,
       xpd = TRUE
@@ -380,11 +380,11 @@ interaction_plot2 <- function (
       text.col = font.col
     )
 
-    par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1))
+    graphics::par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 2.1))
 
   } else if (!is.null(fac2) & !is.null(fac3)) {
-    data_cols <- rgb(f_col(seq(0, 1, length = length(lev1))), maxColorValue = 255)
-    layout(matrix(c(1, 2, 3, 3), 2, 2, byrow = TRUE) , heights = c(8, 2))
+    data_cols <- grDevices::rgb(f_col(seq(0, 1, length = length(lev1))), maxColorValue = 255)
+    graphics::layout(matrix(c(1, 2, 3, 3), 2, 2, byrow = TRUE) , heights = c(8, 2))
     for (j in 1:length(lev3)) {
       df_data_tmp <- df_data[df_data[fac3] == lev3[j], ]
       for (i in 1:length(lev1)) {
@@ -398,29 +398,29 @@ interaction_plot2 <- function (
             axes = FALSE,
             log = plot_type
           )
-          rect(
-            xleft = grconvertX(0,'ndc','user') - 1000,
-            xright = grconvertX(1,'ndc','user') + 1000,
-            ybottom = grconvertY(0,'ndc','user'),
-            ytop = grconvertY(1,'ndc','user'),
+          graphics::rect(
+            xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+            xright = graphics::grconvertX(1,'ndc','user') + 1000,
+            ybottom = graphics::grconvertY(0,'ndc','user'),
+            ytop = graphics::grconvertY(1,'ndc','user'),
             border = NA,
             col = bg.col,
             xpd = TRUE
           )
 
           if (!is.null(bg.col2)) {
-            rect(
-              xleft = grconvertX(0, 'npc', 'user'),
-              xright = grconvertX(1, 'npc', 'user'),
-              ybottom = grconvertY(0, 'npc', 'user'),
-              ytop = grconvertY(1, 'npc', 'user'),
+            graphics::rect(
+              xleft = graphics::grconvertX(0, 'npc', 'user'),
+              xright = graphics::grconvertX(1, 'npc', 'user'),
+              ybottom = graphics::grconvertY(0, 'npc', 'user'),
+              ytop = graphics::grconvertY(1, 'npc', 'user'),
               border = NA,
               col = bg.col2,
               xpd = TRUE
             )
           }
         }
-        points(
+        graphics::points(
           as.numeric(factor(lev2)),
           dat[[response]],
           type = "l",
@@ -431,7 +431,7 @@ interaction_plot2 <- function (
         )
 
         if (!is.null(factor_gold)) {
-          points(
+          graphics::points(
             as.numeric(factor(lev2)),
             dat[[response]],
             type = "p",
@@ -442,7 +442,7 @@ interaction_plot2 <- function (
           )
 
           if (factor_gold[1] == lev1[i] & factor_gold[3] == lev2[j]) {
-            points(
+            graphics::points(
               as.numeric(factor(lev2))[which(levels(factor(lev2)) == as.character(factor_gold[2]))],
               dat[[response]][which(levels(factor(lev2)) == as.character(factor_gold[2]))],
               type = "p",
@@ -454,7 +454,7 @@ interaction_plot2 <- function (
           }
         }
         if (i == 1) {
-          box(col = box.col)
+          graphics::box(col = box.col)
           axis(
             1,
             at = seq_along(as.numeric(factor(lev2))),
@@ -478,7 +478,7 @@ interaction_plot2 <- function (
         }
       }
     }
-    par(mar = c(0, 0, 0, 0))
+    graphics::par(mar = c(0, 0, 0, 0))
     plot(
       NULL,
       NULL,
@@ -487,11 +487,11 @@ interaction_plot2 <- function (
       bg = "grey",
       axes = FALSE
     )
-    rect(
-      xleft = grconvertX(0,'ndc','user') - 1000,
-      xright = grconvertX(1,'ndc','user') + 1000,
-      ybottom = grconvertY(0,'ndc','user'),
-      ytop = grconvertY(1,'ndc','user'),
+    graphics::rect(
+      xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+      xright = graphics::grconvertX(1,'ndc','user') + 1000,
+      ybottom = graphics::grconvertY(0,'ndc','user'),
+      ytop = graphics::grconvertY(1,'ndc','user'),
       border = NA,
       col = bg.col,
       xpd = TRUE
@@ -506,7 +506,7 @@ interaction_plot2 <- function (
       text.col = font.col,
       horiz = FALSE
     )
-    par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
+    graphics::par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
   }
 }
 
@@ -516,7 +516,7 @@ createCombinationMatrix <- function(n, k, l) {
 
 font_color <- function (hex_code) {
   ifelse(
-    ((col2rgb(hex_code)[1] * 0.299) + (col2rgb(hex_code)[2] * 0.587) + (col2rgb(hex_code)[3] * 0.114) > 186),
+    ((grDevices::col2rgb(hex_code)[1] * 0.299) + (grDevices::col2rgb(hex_code)[2] * 0.587) + (grDevices::col2rgb(hex_code)[3] * 0.114) > 186),
     "#000000",
     "#ffffff"
   )
@@ -524,9 +524,9 @@ font_color <- function (hex_code) {
 
 different_hues <- function(hex_code, value = 21) {
   ifelse(
-    ((col2rgb(hex_code)[1] * 0.299) + (col2rgb(hex_code)[2] * 0.587) + (col2rgb(hex_code)[3] * 0.114) > 186),
-    rgb(max(col2rgb(hex_code)[1] - value, 0), max(col2rgb(hex_code)[2] - value, 0), max(col2rgb(hex_code)[3] - value, 0), maxColorValue = 255),
-    rgb(min(col2rgb(hex_code)[1] + value, 255), min(col2rgb(hex_code)[2] + value, 255), min(col2rgb(hex_code)[3] + value,255), maxColorValue = 255)
+    ((grDevices::col2rgb(hex_code)[1] * 0.299) + (grDevices::col2rgb(hex_code)[2] * 0.587) + (grDevices::col2rgb(hex_code)[3] * 0.114) > 186),
+    rgb(max(grDevices::col2rgb(hex_code)[1] - value, 0), max(grDevices::col2rgb(hex_code)[2] - value, 0), max(grDevices::col2rgb(hex_code)[3] - value, 0), maxColorValue = 255),
+    rgb(min(grDevices::col2rgb(hex_code)[1] + value, 255), min(grDevices::col2rgb(hex_code)[2] + value, 255), min(grDevices::col2rgb(hex_code)[3] + value,255), maxColorValue = 255)
   )
 }
 
@@ -892,7 +892,10 @@ ui <- shiny::navbarPage(
                 bsplus::use_bs_tooltip()
               ),
               shinyjs::useShinyjs(debug = TRUE),
-              shinyjs::extendShinyjs(text = jscode),
+              shinyjs::extendShinyjs(
+                text = jscode,
+                functions = c("disableTab", "enableTab")
+                ),
               shinyjs::inlineCSS(css),
               icon = icon("exclamation")
             ),
@@ -2435,7 +2438,7 @@ server <- function(input, output, session) {
   output$graph <- shiny::renderPlot({
     shiny::req(plot_points_data(), input$YRange, input$plot_type, input$pointsize)
 
-    par(oma = c(0, 0, 0, 0), mar = c(0, 3, 0, 0), bg = colthemeCol$ColorBGplot)
+    graphics::par(oma = c(0, 0, 0, 0), mar = c(0, 3, 0, 0), bg = colthemeCol$ColorBGplot)
 
     plot_point <- plot_points_data()
     input$VarChosen
@@ -2465,33 +2468,33 @@ server <- function(input, output, session) {
       axes = FALSE
     )
 
-    rect(
-      xleft = grconvertX(0,'ndc','user') - ifelse(input$plot_type == "lin", 1000, 0),
-      xright = grconvertX(1,'ndc','user') + ifelse(input$plot_type == "lin", 1000, 0),
-      ybottom = grconvertY(0,'ndc','user') - ifelse(input$plot_type == "lin", 1000, 0),
-      ytop = grconvertY(1,'ndc','user') + ifelse(input$plot_type == "lin", 1000, 0),
+    graphics::rect(
+      xleft = graphics::grconvertX(0,'ndc','user') - ifelse(input$plot_type == "lin", 1000, 0),
+      xright = graphics::grconvertX(1,'ndc','user') + ifelse(input$plot_type == "lin", 1000, 0),
+      ybottom = graphics::grconvertY(0,'ndc','user') - ifelse(input$plot_type == "lin", 1000, 0),
+      ytop = graphics::grconvertY(1,'ndc','user') + ifelse(input$plot_type == "lin", 1000, 0),
       border = NA,
       col = colthemeCol$ColorBGplot,
       xpd = TRUE
     )
 
     if (ifelse(shiny::isolate(input$plot_type) == "log", "y", "") == "y") {
-      miniy <- 10^par("usr")[3]
-      maxiy <- 10^par("usr")[4]
-      lowy <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/40)
-      lowyp <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/20)
-      minplustinyy <- 10^(par("usr")[3] + (par("usr")[4] -
-                                             par("usr")[3])/1400)
+      miniy <- 10^graphics::par("usr")[3]
+      maxiy <- 10^graphics::par("usr")[4]
+      lowy <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/40)
+      lowyp <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/20)
+      minplustinyy <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] -
+                                                       graphics::par("usr")[3])/1400)
     } else {
-      miniy <- par("usr")[3]
-      maxiy <- par("usr")[4]
+      miniy <- graphics::par("usr")[3]
+      maxiy <- graphics::par("usr")[4]
       lowy <- miniy + (maxiy - miniy)/40
       lowyp <- miniy + (maxiy - miniy)/20
       minplustinyy <- miniy + (maxiy - miniy)/1400
     }
 
-    minix <- roundDownNice(par("usr")[1])
-    maxix <- roundUpNice(par("usr")[2])
+    minix <- roundDownNice(graphics::par("usr")[1])
+    maxix <- roundUpNice(graphics::par("usr")[2])
 
     nr <- 7
     stepx <- roundUpNice((maxix - minix)/(nr +  1))
@@ -2502,7 +2505,7 @@ server <- function(input, output, session) {
     stripesx <- lapply(stripesx, function(x) x * stepx)
     stripesx <- lapply(stripesx, function(x) x + minix)
     stripesxp <- lapply(stripesx, function(x) paste(floor(x/scresults$results_total[,c(input$x)] * 100), "%"))
-    for (i in seq(1, nr, 2)) rect(stripesx[i],miniy, stripesx[i + 1], maxiy, col = different_hues(colthemeCol$col.bg), border = NA)
+    for (i in seq(1, nr, 2)) graphics::rect(stripesx[i],miniy, stripesx[i + 1], maxiy, col = different_hues(colthemeCol$col.bg), border = NA)
 
 
     if(input$xlabel == TRUE) {
@@ -2510,7 +2513,7 @@ server <- function(input, output, session) {
       text(stripesx, lowyp, stripesxp, cex = 1.5,col = font_color(colthemeCol$col.bg))
     }
 
-    box(col = font_color(colthemeCol$col.bg))
+    graphics::box(col = font_color(colthemeCol$col.bg))
 
     axis(
       2,
@@ -2525,17 +2528,17 @@ server <- function(input, output, session) {
     pch_ <- ifelse(input$pch_value == "19", 19, input$pch_value)
 
     if(shiny::isolate(input$circlestyle) == "standard"){
-      points(white_points$x, white_points$y, pch = pch_, cex = shiny::isolate(input$pointsize), col = white_points$color)
-      points(colored_points$x, colored_points$y, pch = pch_, cex = shiny::isolate(input$pointsize), col = colored_points$color)
+      graphics::points(white_points$x, white_points$y, pch = pch_, cex = shiny::isolate(input$pointsize), col = white_points$color)
+      graphics::points(colored_points$x, colored_points$y, pch = pch_, cex = shiny::isolate(input$pointsize), col = colored_points$color)
     }
     if(input$circlestyle == "groupsize") {
-      points(white_points$x, white_points$y, pch = pch_, cex = shiny::isolate(input$pointsize) * sqrt(scresults$sge[scresults$sge$SGID %in% white_points$ID, 'N.of.subjects'][scresults$sge$nfactors >= input$key[1] & scresults$sge$nfactors <= input$key[2]]/pi), col = white_points$color)
-      points(colored_points$x, colored_points$y, pch = pch_, cex = shiny::isolate(input$pointsize) * sqrt(scresults$sge[scresults$sge$SGID %in% colored_points$ID , 'N.of.subjects'][scresults$sge$nfactors >= input$key[1] & scresults$sge$nfactors <= input$key[2]]/pi), col = colored_points$color)
+      graphics::points(white_points$x, white_points$y, pch = pch_, cex = shiny::isolate(input$pointsize) * sqrt(scresults$sge[scresults$sge$SGID %in% white_points$ID, 'N.of.subjects'][scresults$sge$nfactors >= input$key[1] & scresults$sge$nfactors <= input$key[2]]/pi), col = white_points$color)
+      graphics::points(colored_points$x, colored_points$y, pch = pch_, cex = shiny::isolate(input$pointsize) * sqrt(scresults$sge[scresults$sge$SGID %in% colored_points$ID , 'N.of.subjects'][scresults$sge$nfactors >= input$key[1] & scresults$sge$nfactors <= input$key[2]]/pi), col = colored_points$color)
     }
 
     abline(h = ref_line(), lwd = 3, col = colthemeCol$ColorReference)
 
-    points(shiny::isolate(plot_points_data_complement()),
+    graphics::points(shiny::isolate(plot_points_data_complement()),
            pch = ifelse(input$pch_value == "19", 13, '.'),
            cex = ifelse(input$circlestyle == "groupsize",
                         shiny::isolate(input$pointsize) * sqrt(plot_points_data_complement()$x/pi),
@@ -2544,7 +2547,7 @@ server <- function(input, output, session) {
            col = "#fffb00")
 
     text(
-      x = grconvertX(0.97, from = 'nfc', to = 'user'),
+      x = graphics::grconvertX(0.97, from = 'nfc', to = 'user'),
       y = ref_line() + diff(input$YRange)/50,
       paste0(shiny::isolate(ref_line())),
       col = colthemeCol$ColorReference
@@ -2946,11 +2949,11 @@ server <- function(input, output, session) {
           xlab = "",
           ylab = ""
         )
-        rect(
-          xleft = grconvertX(0,'ndc','user') - 1000,
-          xright = grconvertX(1,'ndc','user') + 1000,
-          ybottom = grconvertY(0,'ndc','user') - 1000,
-          ytop = grconvertY(1,'ndc','user') + 1000,
+        graphics::rect(
+          xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+          xright = graphics::grconvertX(1,'ndc','user') + 1000,
+          ybottom = graphics::grconvertY(0,'ndc','user') - 1000,
+          ytop = graphics::grconvertY(1,'ndc','user') + 1000,
           border = NA,
           col = colthemeCol$ColorBGplot,
           xpd = TRUE
@@ -2997,11 +3000,11 @@ server <- function(input, output, session) {
           xlab = "",
           ylab = ""
         )
-        rect(
-          xleft = grconvertX(0,'ndc','user') - 1000,
-          xright = grconvertX(1, 'ndc', 'user') + 1000,
-          ybottom = grconvertY(0,'ndc','user') - 1000,
-          ytop = grconvertY(1, 'ndc', 'user') + 1000,
+        graphics::rect(
+          xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+          xright = graphics::grconvertX(1, 'ndc', 'user') + 1000,
+          ybottom = graphics::grconvertY(0,'ndc','user') - 1000,
+          ytop = graphics::grconvertY(1, 'ndc', 'user') + 1000,
           border = NA,
           col = colthemeCol$ColorBGplot,
           xpd = TRUE
@@ -3038,11 +3041,11 @@ server <- function(input, output, session) {
           ylab = ""
         )
 
-        rect(
-          xleft = grconvertX(0,'ndc','user') - 1000,
-          xright = grconvertX(1, 'ndc', 'user') + 1000,
-          ybottom = grconvertY(0,'ndc','user') - 1000,
-          ytop = grconvertY(1, 'ndc', 'user') + 1000,
+        graphics::rect(
+          xleft = graphics::grconvertX(0,'ndc','user') - 1000,
+          xright = graphics::grconvertX(1, 'ndc', 'user') + 1000,
+          ybottom = graphics::grconvertY(0,'ndc','user') - 1000,
+          ytop = graphics::grconvertY(1, 'ndc', 'user') + 1000,
           border = NA,
           col = colthemeCol$ColorBGplot,
           xpd = TRUE
@@ -3125,11 +3128,11 @@ server <- function(input, output, session) {
           ylab = ""
         )
 
-        rect(
-          xleft = grconvertX(0,'ndc','user') - 100,
-          xright = grconvertX(1, 'ndc', 'user') + 100,
-          ybottom = grconvertY(0,'ndc','user') - 100,
-          ytop = grconvertY(1, 'ndc', 'user') + 100,
+        graphics::rect(
+          xleft = graphics::grconvertX(0,'ndc','user') - 100,
+          xright = graphics::grconvertX(1, 'ndc', 'user') + 100,
+          ybottom = graphics::grconvertY(0,'ndc','user') - 100,
+          ytop = graphics::grconvertY(1, 'ndc', 'user') + 100,
           border = NA,
           col = colthemeCol$ColorBGplot,
           xpd = TRUE
@@ -3213,11 +3216,11 @@ server <- function(input, output, session) {
         xlab = "",
         ylab = ""
       )
-      rect(
-        xleft = grconvertX(0, 'ndc', 'user') - 1000,
-        xright = grconvertX(1, 'ndc', 'user') + 1000,
-        ybottom = grconvertY(0, 'ndc', 'user') - 1000,
-        ytop = grconvertY(1,'ndc','user') + 1000,
+      graphics::rect(
+        xleft = graphics::grconvertX(0, 'ndc', 'user') - 1000,
+        xright = graphics::grconvertX(1, 'ndc', 'user') + 1000,
+        ybottom = graphics::grconvertY(0, 'ndc', 'user') - 1000,
+        ytop = graphics::grconvertY(1,'ndc','user') + 1000,
         border = NA,
         col = colthemeCol$ColorBGplot,
         xpd = TRUE
@@ -3267,11 +3270,11 @@ server <- function(input, output, session) {
         ylab = ""
       )
 
-      rect(
-        xleft = grconvertX(0, 'ndc', 'user') - 1000,
-        xright = grconvertX(1, 'ndc', 'user') + 1000,
-        ybottom = grconvertY(0,'ndc','user') - 1000,
-        ytop = grconvertY(1, 'ndc', 'user') + 1000,
+      graphics::rect(
+        xleft = graphics::grconvertX(0, 'ndc', 'user') - 1000,
+        xright = graphics::grconvertX(1, 'ndc', 'user') + 1000,
+        ybottom = graphics::grconvertY(0,'ndc','user') - 1000,
+        ytop = graphics::grconvertY(1, 'ndc', 'user') + 1000,
         border = NA,
         col = colthemeCol$ColorBGplot,
         xpd = TRUE
@@ -3307,11 +3310,11 @@ server <- function(input, output, session) {
         xlab = "",
         ylab = ""
       )
-      rect(
-        xleft = grconvertX(0, 'ndc', 'user') - 1000,
-        xright = grconvertX(1, 'ndc', 'user') + 1000,
-        ybottom = grconvertY(0, 'ndc', 'user') - 1000,
-        ytop = grconvertY(1, 'ndc', 'user') + 1000,
+      graphics::rect(
+        xleft = graphics::grconvertX(0, 'ndc', 'user') - 1000,
+        xright = graphics::grconvertX(1, 'ndc', 'user') + 1000,
+        ybottom = graphics::grconvertY(0, 'ndc', 'user') - 1000,
+        ytop = graphics::grconvertY(1, 'ndc', 'user') + 1000,
         border = NA,
         col = colthemeCol$ColorBGplot,
         xpd = TRUE
@@ -4117,7 +4120,7 @@ server <- function(input, output, session) {
 
     shiny::req(plot_points_data2(), input$YRange2, input$plot_type, input$pointsize)
 
-    par(oma = c(0, 0, 0, 0), mar = c(0, 3, 0, 0), bg = colthemeCol$ColorBGplot)
+    graphics::par(oma = c(0, 0, 0, 0), mar = c(0, 3, 0, 0), bg = colthemeCol$ColorBGplot)
 
     plot_point <- plot_points_data2()
     all_points <- cbind(plot_point, color, stringsAsFactors = FALSE)
@@ -4138,32 +4141,32 @@ server <- function(input, output, session) {
       axes = FALSE,
       type = "n"
     )
-    rect(
-      xleft = grconvertX(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
-      xright = grconvertX(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
-      ybottom = grconvertY(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
-      ytop = grconvertY(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
+    graphics::rect(
+      xleft = graphics::grconvertX(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
+      xright = graphics::grconvertX(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
+      ybottom = graphics::grconvertY(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
+      ytop = graphics::grconvertY(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
       border = NA,
       col = colthemeCol$ColorBGplot,
       xpd = TRUE
     )
     if (ifelse(input$plot_type2 == "log", "y", "") == "y") {
-      miniy <- 10^par("usr")[3]
-      maxiy <- 10^par("usr")[4]
-      lowy  <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/40)
-      lowyp <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/15)
-      minplustinyy <- 10^(par("usr")[3] + (par("usr")[4] -
-                                             par("usr")[3])/1400)
+      miniy <- 10^graphics::par("usr")[3]
+      maxiy <- 10^graphics::par("usr")[4]
+      lowy  <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/40)
+      lowyp <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/15)
+      minplustinyy <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] -
+                                                       graphics::par("usr")[3])/1400)
     } else {
-      miniy <- par("usr")[3]
-      maxiy <- par("usr")[4]
+      miniy <- graphics::par("usr")[3]
+      maxiy <- graphics::par("usr")[4]
       lowy  <- miniy + (maxiy - miniy)/40
       lowyp <- miniy + (maxiy - miniy)/15
       minplustinyy <- miniy + (maxiy - miniy)/1400
     }
 
-    minix <- roundDownNice(par("usr")[1])
-    maxix <- roundUpNice(par("usr")[2])
+    minix <- roundDownNice(graphics::par("usr")[1])
+    maxix <- roundUpNice(graphics::par("usr")[2])
     nr <- 7
     stepx <- roundUpNice((maxix - minix)/(nr +  1))
     if (minix < stepx)
@@ -4174,7 +4177,7 @@ server <- function(input, output, session) {
     stripesxp <- lapply(stripesx, function(x) paste(floor(x/scresults$results_total[,c(input$x2)] * 100), "%"))
 
     for (i in seq(1, nr, 2)) {
-      rect(
+      graphics::rect(
         stripesx[i],
         miniy,
         stripesx[i + 1],
@@ -4188,7 +4191,7 @@ server <- function(input, output, session) {
       text(stripesx, lowyp, stripesxp, cex = 1.2, col = font_color(colthemeCol$col.bg))
     }
 
-    box(col = font_color(colthemeCol$col.bg))
+    graphics::box(col = font_color(colthemeCol$col.bg))
 
     graphics::axis(
       side = 2,
@@ -4214,16 +4217,16 @@ server <- function(input, output, session) {
     pch_ <- ifelse(input$pch_value == "19", 19, input$pch_value)
 
     if (input$circlestyle == "standard") {
-      points(white_points$x, white_points$y, pch = pch_, cex = input$pointsize, col = white_points$color)
-      points(colored_points$x, colored_points$y, pch = pch_, cex = input$pointsize, col = colored_points$color)
+      graphics::points(white_points$x, white_points$y, pch = pch_, cex = input$pointsize, col = white_points$color)
+      graphics::points(colored_points$x, colored_points$y, pch = pch_, cex = input$pointsize, col = colored_points$color)
     }
     if (input$circlestyle == "groupsize") {
-      points(
+      graphics::points(
         white_points$x,
         white_points$y,
         pch = pch_,
         cex = input$pointsize * sqrt(scresults$sge[scresults$sge$SGID %in% white_points$ID, 'N.of.subjects'][scresults$sge$nfactors >= input$key[1] & scresults$sge$nfactors <= input$key[2]]/pi), col = white_points$color)
-      points(
+      graphics::points(
         colored_points$x,
         colored_points$y,
         pch = pch_,
@@ -4231,12 +4234,12 @@ server <- function(input, output, session) {
     }
 
     text(
-      x = grconvertX(0.97, from = 'npc', to = 'user'),
-      y = grconvertY(0.06, from = 'nfc', to = 'user') + ref_line(),
+      x = graphics::grconvertX(0.97, from = 'npc', to = 'user'),
+      y = graphics::grconvertY(0.06, from = 'nfc', to = 'user') + ref_line(),
       paste0(ref_line()), col = colthemeCol$ColorReference
     )
 
-    points(shiny::isolate(plot_points_data_complement()),
+    graphics::points(shiny::isolate(plot_points_data_complement()),
            pch = ifelse(input$pch_value == "19", 13, '.'),
            cex = ifelse(input$circlestyle == "groupsize",
                         shiny::isolate(input$pointsize) * sqrt(plot_points_data_complement()$x/pi),
@@ -4312,7 +4315,7 @@ server <- function(input, output, session) {
     white_points <- all_points[all_points$color %in% c("#FFFFFFFF", "#FFFFFFBF", "#FFFFFF80", "#FFFFFF40", "#FFFFFF1A"),]
     colored_points <- all_points[!all_points$color %in% c("#FFFFFFFF", "#FFFFFFBF", "#FFFFFF80", "#FFFFFF40", "#FFFFFF1A"),]
 
-    par(oma = c(0, 0, 0, 0), mar = c(0, 3, 0, 0), bg = colthemeCol$ColorBGplot)
+    graphics::par(oma = c(0, 0, 0, 0), mar = c(0, 3, 0, 0), bg = colthemeCol$ColorBGplot)
     plot(
       all_points$x,
       all_points$y,
@@ -4327,32 +4330,32 @@ server <- function(input, output, session) {
       bg = colthemeCol$ColorBGplot
     )
 
-    rect(
-      xleft = grconvertX(0, 'ndc', 'user'),
-      xright = grconvertX(1, 'ndc', 'user'),
-      ybottom = grconvertY(0, 'ndc', 'user'),
-      ytop = grconvertY(1, 'ndc', 'user'),
+    graphics::rect(
+      xleft = graphics::grconvertX(0, 'ndc', 'user'),
+      xright = graphics::grconvertX(1, 'ndc', 'user'),
+      ybottom = graphics::grconvertY(0, 'ndc', 'user'),
+      ytop = graphics::grconvertY(1, 'ndc', 'user'),
       border = NA,
       col = colthemeCol$ColorBGplot,
       xpd = TRUE
     )
     if (log_type$graph3 == "y") {
-      miniy <- 10^par("usr")[3]
-      maxiy <- 10^par("usr")[4]
-      lowy  <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/40)
-      lowyp <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/15)
-      minplustinyy <- 10^(par("usr")[3] + (par("usr")[4] -
-                                             par("usr")[3])/1400)
+      miniy <- 10^graphics::par("usr")[3]
+      maxiy <- 10^graphics::par("usr")[4]
+      lowy  <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/40)
+      lowyp <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/15)
+      minplustinyy <- 10^(par("usr")[3] + (graphics::par("usr")[4] -
+                                             graphics::par("usr")[3])/1400)
     } else {
-      miniy <- par("usr")[3]
-      maxiy <- par("usr")[4]
+      miniy <- graphics::par("usr")[3]
+      maxiy <- graphics::par("usr")[4]
       lowy <- miniy + (maxiy - miniy)/40
       lowyp <- miniy + (maxiy - miniy)/15
       minplustinyy <- miniy + (maxiy - miniy)/1400
     }
 
-    minix <- roundDownNice(par("usr")[1])
-    maxix <- roundUpNice(par("usr")[2])
+    minix <- roundDownNice(graphics::par("usr")[1])
+    maxix <- roundUpNice(graphics::par("usr")[2])
     nr <- 7
     stepx <- roundUpNice((maxix - minix)/(nr +  1))
     if (minix < stepx)
@@ -4362,12 +4365,12 @@ server <- function(input, output, session) {
     stripesx <- lapply(stripesx, function(x) x + minix)
     stripesxp <- lapply(stripesx, function(x) paste(floor(x/scresults$results_total[,c(input$x2)] * 100), "%"))
 
-    for (i in seq(1, nr, 2)) rect(stripesx[i],miniy, stripesx[i + 1], maxiy, col = different_hues(colthemeCol$col.bg), border = NA)
+    for (i in seq(1, nr, 2)) graphics::rect(stripesx[i],miniy, stripesx[i + 1], maxiy, col = different_hues(colthemeCol$col.bg), border = NA)
     if (input$xlabel == TRUE) {
       text(stripesx, lowy, stripesx, cex = 1.2, col=font_color(colthemeCol$col.bg))
       text(stripesx, lowyp, stripesxp, cex = 1.2, col=font_color(colthemeCol$col.bg))
     }
-    box(col = font_color(colthemeCol$col.bg))
+    graphics::box(col = font_color(colthemeCol$col.bg))
     axis(
       2,
       col = font_color(colthemeCol$col.bg),
@@ -4384,14 +4387,14 @@ server <- function(input, output, session) {
     pch_ <- ifelse(input$pch_value == "19", 19, input$pch_value)
 
     if (input$circlestyle == "standard") {
-      points(
+      graphics::points(
         white_points$x,
         white_points$y,
         pch = pch_,
         cex = input$pointsize,
         col = white_points$color
       )
-      points(
+      graphics::points(
         colored_points$x,
         colored_points$y,
         pch = pch_,
@@ -4400,14 +4403,14 @@ server <- function(input, output, session) {
       )
     }
     if (input$circlestyle == "groupsize") {
-      points(
+      graphics::points(
         white_points$x,
         white_points$y,
         pch = pch_,
         cex = input$pointsize * sqrt(scresults$sge[scresults$sge$SGID %in% white_points$ID, 'N.of.subjects'][scresults$sge$nfactors >= input$key[1] & scresults$sge$nfactors <= input$key[2]]/pi),
         col = white_points$color
       )
-      points(
+      graphics::points(
         colored_points$x,
         colored_points$y,
         pch = pch_,
@@ -4431,7 +4434,7 @@ server <- function(input, output, session) {
       )
     }
 
-    points(
+    graphics::points(
       shiny::isolate(plot_points_data_complement()),
       pch = ifelse(input$pch_value == "19", 13, '.'),
       cex = ifelse(input$circlestyle == "groupsize",
@@ -4442,8 +4445,8 @@ server <- function(input, output, session) {
     )
 
     text(
-      x = grconvertX(0.97, from = 'nfc', to = 'user'),
-      y = grconvertY(0.06,from = 'nfc', to = 'user') + scresults$results_total[, c(input$y2)], paste0(scresults$results_total[, c(input$y2)]),
+      x = graphics::grconvertX(0.97, from = 'nfc', to = 'user'),
+      y = graphics::grconvertY(0.06,from = 'nfc', to = 'user') + scresults$results_total[, c(input$y2)], paste0(scresults$results_total[, c(input$y2)]),
       col = colthemeCol$ColorReference
     )
   })
@@ -4455,7 +4458,7 @@ server <- function(input, output, session) {
 
     key <- shiny::req(input$key)
     if (ifelse(input$plot_type2 == "log", "y", "") != "y" & log_type$graph3 != "y") {
-      par(
+      graphics::par(
         oma = c(0, 0, 0, 0),
         mar = c(3, 3, 1, 1),
         bg = colthemeCol$ColorBGplot
@@ -4475,11 +4478,11 @@ server <- function(input, output, session) {
         log = ""
       )
 
-      rect(
-        xleft = grconvertX(0,'ndc','user'),
-        xright = grconvertX(1,'ndc','user'),
-        ybottom = grconvertY(0,'ndc','user') ,
-        ytop = grconvertY(1,'ndc','user') ,
+      graphics::rect(
+        xleft = graphics::grconvertX(0,'ndc','user'),
+        xright = graphics::grconvertX(1,'ndc','user'),
+        ybottom = graphics::grconvertY(0,'ndc','user') ,
+        ytop = graphics::grconvertY(1,'ndc','user') ,
         border = NA,
         col = colthemeCol$ColorBGplot,
         xpd = TRUE
@@ -4504,7 +4507,7 @@ server <- function(input, output, session) {
     }
 
     if (ifelse(input$plot_type2 == "log", "y", "") == "y" & log_type$graph3 != "y") {
-      par(
+      graphics::par(
         oma = c(0, 0, 0, 0),
         mar = c(3, 3, 1, 1),
         bg = colthemeCol$ColorBGplot
@@ -4524,11 +4527,11 @@ server <- function(input, output, session) {
         log = "x"
       )
 
-      rect(
-        xleft = grconvertX(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
-        xright = grconvertX(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
-        ybottom = grconvertY(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
-        ytop = grconvertY(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
+      graphics::rect(
+        xleft = graphics::grconvertX(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
+        xright = graphics::grconvertX(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
+        ybottom = graphics::grconvertY(0,'ndc','user') - ifelse(input$plot_type2 == "lin", 1000, 0),
+        ytop = graphics::grconvertY(1,'ndc','user') + ifelse(input$plot_type2 == "lin", 1000, 0),
         border = NA,
         col = colthemeCol$ColorBGplot,
         xpd = TRUE
@@ -4553,7 +4556,7 @@ server <- function(input, output, session) {
     }
 
     if (ifelse(input$plot_type2 == "log", "y", "") != "y" & log_type$graph3 == "y") {
-      par(
+      graphics::par(
         oma = c(0, 0, 0, 0),
         mar = c(3, 3, 1, 1),
         bg = colthemeCol$ColorBGplot
@@ -4573,11 +4576,11 @@ server <- function(input, output, session) {
         log = "y"
       )
 
-      rect(
-        xleft = grconvertX(0,'ndc','user'),
-        xright = grconvertX(1,'ndc','user'),
-        ybottom = grconvertY(0,'ndc','user'),
-        ytop = grconvertY(1,'ndc','user'),
+      graphics::rect(
+        xleft = graphics::grconvertX(0,'ndc','user'),
+        xright = graphics::grconvertX(1,'ndc','user'),
+        ybottom = graphics::grconvertY(0,'ndc','user'),
+        ytop = graphics::grconvertY(1,'ndc','user'),
         border = NA,
         col = colthemeCol$ColorBGplot,
         xpd = TRUE
@@ -4602,7 +4605,7 @@ server <- function(input, output, session) {
     }
 
     if (ifelse(input$plot_type2 == "log", "y", "") == "y" & log_type$graph3 == "y") {
-      par(
+      graphics::par(
         oma = c(0, 0, 0, 0),
         mar = c(3, 3, 1, 1),
         bg = colthemeCol$ColorBGplot
@@ -4622,11 +4625,11 @@ server <- function(input, output, session) {
         log = "yx"
       )
 
-      rect(
-        xleft = grconvertX(0, 'ndc', 'user'),
-        xright = grconvertX(1, 'ndc', 'user'),
-        ybottom = grconvertY(0, 'ndc', 'user'),
-        ytop = grconvertY(1, 'ndc', 'user'),
+      graphics::rect(
+        xleft = graphics::grconvertX(0, 'ndc', 'user'),
+        xright = graphics::grconvertX(1, 'ndc', 'user'),
+        ybottom = graphics::grconvertY(0, 'ndc', 'user'),
+        ytop = graphics::grconvertY(1, 'ndc', 'user'),
         border = NA,
         col = colthemeCol$ColorBGplot,
         xpd = TRUE
@@ -4650,7 +4653,7 @@ server <- function(input, output, session) {
       )
     }
 
-    box(col = font_color(colthemeCol$col.bg))
+    graphics::box(col = font_color(colthemeCol$col.bg))
     axis(
       1,
       col = font_color(colthemeCol$col.bg),
@@ -4822,7 +4825,7 @@ server <- function(input, output, session) {
     tr.mean.z <- (mean.z-rg.z[1])/diff(rg.z)
     f_colZ <- colorRamp(colrange.z, bias = log(tr.mean.z, base = 0.5))
 
-    par(
+    graphics::par(
       mar = c(1, 8, 3, 12),
       bg = col.bg,
       oma = c(0, 0, 0, 0)
@@ -4844,9 +4847,9 @@ server <- function(input, output, session) {
         col.z.ij <- ifelse(
           is.na(val.z.ij),
           col.bg,
-          rgb(f_colZ((val.z.ij - rg.z[1])/diff(rg.z)), maxColorValue = 255)
+          grDevices::rgb(f_colZ((val.z.ij - rg.z[1])/diff(rg.z)), maxColorValue = 255)
         )
-        rect(
+        graphics::rect(
           xleft = prop.x[i],
           xright = prop.x[i + 1],
           ybottom = prop.y[j],
@@ -4879,16 +4882,16 @@ server <- function(input, output, session) {
       cex = ifelse(is.null(mos.y2), 1, 0.75)
     )
 
-    leg.x <- grconvertX(1,'npc','user') + 0.5 * (grconvertX(1, 'ndc', 'user') - grconvertX(1, 'npc', 'user'))
-    leg.y <- seq(grconvertY(0.1, 'npc', 'user'), grconvertY(0.9, 'npc', 'user'), length.out = 201)
+    leg.x <- graphics::grconvertX(1,'npc','user') + 0.5 * (graphics::grconvertX(1, 'ndc', 'user') - graphics::grconvertX(1, 'npc', 'user'))
+    leg.y <- seq(graphics::grconvertY(0.1, 'npc', 'user'), graphics::grconvertY(0.9, 'npc', 'user'), length.out = 201)
     leg.width <- 0.05
-    rect(
+    graphics::rect(
       xleft = leg.x - leg.width / 2,
       xright = leg.x + leg.width / 2,
       ybottom = leg.y[-1],
       ytop = leg.y[-length(leg.y)],
       xpd = NA,
-      col = rgb(f_colZ(seq(0, 1, length.out = length(leg.y) - 1)), maxColorValue = 255), border = NA)
+      col = grDevices::rgb(f_colZ(seq(0, 1, length.out = length(leg.y) - 1)), maxColorValue = 255), border = NA)
 
     ndig <- 2
     if(shiny::req(input$logmosaic) == "lin") {
@@ -4938,7 +4941,7 @@ server <- function(input, output, session) {
 
     text(
       x = leg.x,
-      y = grconvertY(0.925, 'npc', 'user'),
+      y = graphics::grconvertY(0.925, 'npc', 'user'),
       xpd = NA,
       col = col.txt,
       adj = c(0.5, 0),
@@ -5132,7 +5135,7 @@ server <- function(input, output, session) {
     shiny::req(plot_points_data5())
     input$screening_forward
     input$screening_backward
-    par(
+    graphics::par(
       oma = c(0, 0, 0, 0),
       mar = c(0, 3, 0, 0),
       bg = colthemeCol$ColorBGplot
@@ -5170,32 +5173,32 @@ server <- function(input, output, session) {
       type = "n",
       axes = FALSE
     )
-    rect(
-      xleft = grconvertX(0,'ndc','user') - ifelse(pl_typ == "lin", 1000, 0),
-      xright = grconvertX(1,'ndc','user') + ifelse(pl_typ == "lin", 1000, 0),
-      ybottom = grconvertY(0,'ndc','user') - ifelse(pl_typ == "lin", 1000, 0),
-      ytop = grconvertY(1,'ndc','user') + ifelse(pl_typ == "lin", 1000, 0),
+    graphics::rect(
+      xleft = graphics::grconvertX(0,'ndc','user') - ifelse(pl_typ == "lin", 1000, 0),
+      xright = graphics::grconvertX(1,'ndc','user') + ifelse(pl_typ == "lin", 1000, 0),
+      ybottom = graphics::grconvertY(0,'ndc','user') - ifelse(pl_typ == "lin", 1000, 0),
+      ytop = graphics::grconvertY(1,'ndc','user') + ifelse(pl_typ == "lin", 1000, 0),
       border = NA,
       col = colthemeCol$ColorBGplot,
       xpd = TRUE
     )
     if (ifelse(pl_typ == "log", "y", "") == "y") {
-      miniy <- 10^par("usr")[3]
-      maxiy <- 10^par("usr")[4]
-      lowy <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/40)
-      lowyp <- 10^(par("usr")[3] + (par("usr")[4] - par("usr")[3])/15)
-      minplustinyy <- 10^(par("usr")[3] + (par("usr")[4] -
-                                             par("usr")[3])/1400)
+      miniy <- 10^graphics::par("usr")[3]
+      maxiy <- 10^graphics::par("usr")[4]
+      lowy <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/40)
+      lowyp <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] - graphics::par("usr")[3])/15)
+      minplustinyy <- 10^(graphics::par("usr")[3] + (graphics::par("usr")[4] -
+                                             graphics::par("usr")[3])/1400)
     } else {
-      miniy <- par("usr")[3]
-      maxiy <- par("usr")[4]
+      miniy <- graphics::par("usr")[3]
+      maxiy <- graphics::par("usr")[4]
       lowy <- miniy + (maxiy - miniy)/40
       lowyp <- miniy + (maxiy - miniy)/15
       minplustinyy <- miniy + (maxiy - miniy)/1400
     }
 
-    minix <- roundDownNice(par("usr")[1])
-    maxix <- roundUpNice(par("usr")[2])
+    minix <- roundDownNice(graphics::par("usr")[1])
+    maxix <- roundUpNice(graphics::par("usr")[2])
 
     nr <- 7
     stepx <- roundUpNice((maxix - minix)/(nr +  1))
@@ -5206,7 +5209,7 @@ server <- function(input, output, session) {
     stripesx <- lapply(stripesx, function(x) x + minix)
     stripesxp <- lapply(stripesx, function(x) paste(floor(x/scresults$results_total[,c(input$x)] * 100), "%"))
 
-    for (i in seq(1, nr, 2)) rect(stripesx[i],miniy, stripesx[i + 1], maxiy, col = different_hues(colthemeCol$col.bg), border = NA)
+    for (i in seq(1, nr, 2)) graphics::rect(stripesx[i],miniy, stripesx[i + 1], maxiy, col = different_hues(colthemeCol$col.bg), border = NA)
 
 
     if (input$xlabel == TRUE) {
@@ -5214,7 +5217,7 @@ server <- function(input, output, session) {
       text(stripesx, lowyp, stripesxp, cex = 1.2, col = font_color(colthemeCol$col.bg))
     }
 
-    box(col = font_color(colthemeCol$col.bg))
+    graphics::box(col = font_color(colthemeCol$col.bg))
 
     axis(
       2,
@@ -5235,14 +5238,14 @@ server <- function(input, output, session) {
 
 
     if (input$circlestyle == "standard") {
-      points(
+      graphics::points(
         white_points$x,
         white_points$y,
         pch = pch_,
         cex = input$pointsize,
         col = white_points$color
       )
-      points(
+      graphics::points(
         colored_points$x,
         colored_points$y,
         pch = pch_,
@@ -5252,14 +5255,14 @@ server <- function(input, output, session) {
     }
 
     if (input$circlestyle == "groupsize") {
-      points(
+      graphics::points(
         white_points$x,
         white_points$y,
         pch = pch_,
         cex = input$pointsize * sqrt(scresults$sge[scresults$sge$SGID %in% white_points$ID, 'N.of.subjects'][scresults$sge$nfactors >= input$keys_asmus[1] & scresults$sge$nfactors <= input$keys_asmus[2]]/pi),
         col = white_points$color
       )
-      points(
+      graphics::points(
         colored_points$x,
         colored_points$y,
         pch = pch_,
@@ -5268,20 +5271,20 @@ server <- function(input, output, session) {
       )
     }
 
-    abline(
+    graphics::abline(
       h = ref_line(),
       lwd = 3,
       col = colthemeCol$ColorReference
     )
-    text(
-      x = grconvertX(0.97, from = 'nfc', to = 'user'),
+    graphics::text(
+      x = graphics::grconvertX(0.97, from = 'nfc', to = 'user'),
       y = ref_line() + diff(input$YRange)/50,
       col = colthemeCol$ColorReference
     )
 
     if (input$grid == TRUE) {
-      abline(h = axTicks(2), lty = 2, col = font_color(colthemeCol$col.bg), lwd = 0.3)
-      abline(v = axTicks(1), lty = 2, col = font_color(colthemeCol$col.bg), lwd = 0.3)
+      graphics::abline(h = axTicks(2), lty = 2, col = font_color(colthemeCol$col.bg), lwd = 0.3)
+      graphics::abline(v = axTicks(1), lty = 2, col = font_color(colthemeCol$col.bg), lwd = 0.3)
     }
   })
   }
@@ -5320,7 +5323,7 @@ server <- function(input, output, session) {
     top_px <- ifelse(top_pct <= 0.5,
                      20 + hover$range$top + top_pct * (hover$range$bottom - hover$range$top),
                      - 115 + hover$range$top + top_pct * (hover$range$bottom - hover$range$top))
-    style <- paste0("position:absolute; z-index:100;background-color: rgba(",col2rgb(point$color)[1],",",col2rgb(point$color)[2],",",col2rgb(point$color)[3],",0.85); ",
+    style <- paste0("position:absolute; z-index:100;background-color: rgba(",grDevices::col2rgb(point$color)[1],",",grDevices::col2rgb(point$color)[2],",",grDevices::col2rgb(point$color)[3],",0.85); ",
                     "left:", left_px, "px; top:", top_px, "px; border: 0px;")
     point <- point[1,]
 
@@ -5425,11 +5428,11 @@ server <- function(input, output, session) {
 
     style <- paste0(
       "position:absolute; z-index:100;background-color: rgba(",
-      col2rgb(point$color)[1],
+      grDevices::col2rgb(point$color)[1],
       ",",
-      col2rgb(point$color)[2],
+      grDevices::col2rgb(point$color)[2],
       ",",
-      col2rgb(point$color)[3],
+      grDevices::col2rgb(point$color)[3],
       ",0.85); ",
       "left:",
       left_px,
@@ -5534,11 +5537,11 @@ server <- function(input, output, session) {
                      - 115 + hover$range$top + top_pct * (hover$range$bottom - hover$range$top))
     style <- paste0(
       "position:absolute; z-index:100;background-color: rgba(",
-      col2rgb(point$color)[1],
+      grDevices::col2rgb(point$color)[1],
       ",",
-      col2rgb(point$color)[2],
+      grDevices::col2rgb(point$color)[2],
       ",",
-      col2rgb(point$color)[3],
+      grDevices::col2rgb(point$color)[3],
       ",0.85); ",
       "left:",
       left_px,
@@ -5641,7 +5644,7 @@ server <- function(input, output, session) {
     top_px <- ifelse(top_pct <= 0.5,
                      20 + hover$range$top + top_pct * (hover$range$bottom - hover$range$top),
                      - 115 + hover$range$top + top_pct * (hover$range$bottom - hover$range$top))
-    style <- paste0("position:absolute; z-index:100;background-color: rgba(",col2rgb(point$color)[1],",",col2rgb(point$color)[2],",",col2rgb(point$color)[3],",0.85); ",
+    style <- paste0("position:absolute; z-index:100;background-color: rgba(",grDevices::col2rgb(point$color)[1],",",grDevices::col2rgb(point$color)[2],",",grDevices::col2rgb(point$color)[3],",0.85); ",
                     "left:", left_px, "px; top:", top_px, "px; border: 0px;")
     point <- point[1,]
 
@@ -5692,7 +5695,7 @@ server <- function(input, output, session) {
     top_px <- ifelse(top_pct <= 0.5,
                      20 + hover$range$top + top_pct * (hover$range$bottom - hover$range$top),
                      - 115 + hover$range$top + top_pct * (hover$range$bottom - hover$range$top))
-    style <- paste0("position:absolute; z-index:100; background-color: rgba(", col2rgb(point$color)[1],",", col2rgb(point$color)[2],",",col2rgb(point$color)[3],",0.85); ",
+    style <- paste0("position:absolute; z-index:100; background-color: rgba(", grDevices::col2rgb(point$color)[1],",", grDevices::col2rgb(point$color)[2],",",grDevices::col2rgb(point$color)[3],",0.85); ",
                     "left:", left_px, "px; top:", top_px, "px; border: 0px;")
     point <- point[1,]
 

@@ -103,3 +103,8 @@
 #Hovertable
 *Change font color for hovertable
 
+# subscreen 3.0.1
+
+## Bug fixes subscreenshow
+
+* An update of the package shinyjs required a change in the call of the extendShinyjs function to avoid an error while trying to start subscreenshow. This was corrected.

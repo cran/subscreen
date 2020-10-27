@@ -1,7 +1,7 @@
 Package: subscreen
 Type: Package
 Title: Systematic Screening of Study Data for Subgroup Effects
-Version: 3.0.0
+Version: 3.0.1
 Author: Bodo Kirsch, Steffen Jeske, Susanne Lippert, Thomas Schmelter, Christoph Muysers, Hermann Kulmann
 Maintainer: Bodo Kirsch <bodo.kirsch@bayer.com>
 Description: Identifying outcome relevant subgroups has now become as simple as possible! The formerly lengthy and tedious search for the needle in a haystack will be replaced by a single, comprehensive and coherent presentation.
@@ -24,8 +24,8 @@ Imports: utils, plyr, data.table, grDevices, graphics, shiny, DT,
         randomForestSRC, V8, purrr, shinyWidgets
 Suggests: parallel, survival, knitr, rmarkdown
 NeedsCompilation: no
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
-Packaged: 2020-07-30 15:23:09 UTC; sgfpj
+Packaged: 2020-10-16 14:51:58 UTC; sgfpj
 Repository: CRAN
-Date/Publication: 2020-07-31 01:00:02 UTC
+Date/Publication: 2020-10-27 08:10:02 UTC

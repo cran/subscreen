@@ -1,6 +1,6 @@
 ---
 title: "subscreen Package Manual"
-author: "Bodo Kirsch, Susanne Lippert, Thomas Schmelter, Steffen Jeske, Christoph Muysers, Hermann Kulmann"
+author: "Bodo Kirsch, Steffen Jeske, Susanne Lippert, Thomas Schmelter, Christoph Muysers, Hermann Kulmann"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -46,4 +46,4 @@ The output object of subsreencalc will be the input for subscreenshow.
 
 # Things to consider
 
-There should be no "NA" values in the input data set. If there are values "NA" consider replacing them by "No data" or a certain value. The eval-function() should include exception handling for functions that require  a certain input. For example the coxph() function should only be executed if there is at least one observation in each treatment arm (see example). Otherwise program will abort with error. 
+There should be no "NA" values in the input data set. If there are values "NA" consider replacing them by "No data" or a certain value. The eval-function() should include exception handling for functions that require  a certain input to assure a valid return value (NA is also valid). For example the coxph() function should only be executed if there is at least one observation in each treatment arm (see example). This can be achieved by using trycatch() or a condition. Otherwise the program will abort with error. 
