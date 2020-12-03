@@ -63,44 +63,44 @@
 *Add flexible Plot Legends
 
 ##Subscreen Explorer-tab
-#Variable Options-tab
+###Variable Options-tab
 *Add logarithmic Slider 
 
-#Importance-tab
+###Importance-tab
 *Add 'Select Variable'-option to select target variable
 *Bug fix importance color 
 
-#Display Options-tab
+###Display Options-tab
 *Add 'Adjust point brightness'-option
 *Remove 'Choose number of Stripes background'-option
 *Add 'Plotting character'-option
 
-#Colour Options
+###Colour Options
 *Add 'Colour for factorial Context'-option
 *Remove 'Choose Background Colour (Plot stripes)'-option
 *Remove 'Choose font colour'-option
 
-#Plots
+###Plots
 *Add interaction Plot
 
-#Tables
+###Tables
 *Add 'Factorial Context'-table
 *Add 'Subgroup Complement'-table
 
 ##Subscreen Comparer-tab
-#Sidebarpanel
+###Sidebarpanel
 *Remove 'Subgroup Filter'-option
 *Remove 'Subgroup level(s)'-option
-#Compare-plots
+###Compare-plots
 *Add legend
-#Bubble plot
+###Bubble plot
 *Add legend
 
 ##Subscreen Mosaic-tab
-#Sidebarpanel
+###Sidebarpanel
 *Add help text
 
-#Hovertable
+###Hovertable
 *Change font color for hovertable
 
 # subscreen 3.0.1
@@ -108,3 +108,16 @@
 ## Bug fixes subscreenshow
 
 * An update of the package shinyjs required a change in the call of the extendShinyjs function to avoid an error while trying to start subscreenshow. This was corrected.
+
+# subscreen 3.0.2
+
+## General
+* Dependency to package V8 removed
+* Time report of subscreencalc() including the calculation of the factorial context
+
+## Bug fix subscreenshow()
+* reastablish compatibility with R version 3.6.2
+
+## Bug fix Subscreen ASMUS-tab
+* label for reference line corrected
+

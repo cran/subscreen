@@ -113,8 +113,6 @@ pbcdat$'timeos' <- pbcdat$time
 #variable importance for OS for the created categorical variables
 #(higher is more important, also works for numeric variables)
 varnames <- c('ageg', 'sex', 'bilig', 'cholg', 'astg', 'albuming', 'phosg')
-results.vi <- subscreenvi(data=pbcdat, y=c('timeos','timepfs'),
- cens='event.os', trt='trt', x=varnames)
 # define function the eval_function()
 # Attention: The eval_function ALWAYS needs to return a dataframe with one row.
 #            Include exception handling, like if(N1>0 && N2>0) hr <- exp(coxph(...) )
@@ -145,10 +143,9 @@ results <- subscreencalc(data=pbcdat,
                      endpoints = c("timepfs" , "event.pfs", "timeos", "event.os"),
                      treat="trt",
                      subjectid = "id",
-                     factors=c("ageg", "sex", "bilig", "cholg", "copperg", "astg",
-                               "albuming", "phosg"),
+                     factors=c("ageg", "sex", "bilig", "cholg", "copperg"),
                      use_complement = FALSE,
-                     factorial = TRUE)
+                     factorial = FALSE)
 
 # visualize the results of the subgroup screening with a Shiny app
 subscreenshow(results)}

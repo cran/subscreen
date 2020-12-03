@@ -10,10 +10,6 @@ if (!requireNamespace("bsplus", quietly = TRUE)) {
   cat("Error: subscreenshow requires the package bsplus to be installed")
   stop()
 }
-if (!requireNamespace("V8", quietly = TRUE)) {
-  cat("Error: subscreenshow requires the package V8 to be installed")
-  stop()
-}
 if (!requireNamespace("jsonlite", quietly = TRUE)) {
   cat("Error: subscreenshow requires the package jsonlite to be installed")
   stop()
@@ -34,7 +30,6 @@ if (!requireNamespace("dplyr", quietly = TRUE)) {
 suppressMessages(library(shiny))
 suppressMessages(library(shinyjs))
 suppressMessages(library(bsplus))
-suppressMessages(library(V8))
 suppressMessages(library(jsonlite))
 suppressMessages(library(colourpicker))
 suppressMessages(library(DT))
@@ -644,7 +639,7 @@ ui <- shiny::navbarPage(
         "
       )
     ),
-    chooseSliderSkin("Nice", color = "#112446"),
+    shinyWidgets::chooseSliderSkin("Nice", color = "#112446"),
     ####... 1. cont_nav (uiOutput)####
     shiny::uiOutput('cont_nav'),
     shiny::fluidPage(
@@ -1127,29 +1122,35 @@ ui <- shiny::navbarPage(
           id = "myid2",
           ####... 43. cont_well2 (uiOutput)####
           shiny::uiOutput('cont_well2'),
-          shiny::div(style = "position:absolute;right:2em;",
-            bsplus::bs_embed_tooltip(tag = shiny_iconlink("question "),
-            title = "Variable plotted on the y-axis (upper plot).",
-            placement = "top",
-            expanded = TRUE
+          shiny::div(
+            style = "position:absolute;right:2em;",
+            bsplus::bs_embed_tooltip(
+              tag = shiny_iconlink("question "),
+              title = "Variable plotted on the y-axis (upper plot).",
+              placement = "top",
+              expanded = TRUE
             )
           ),
           ####... 44. y1 (uiOutput)####
           shiny::uiOutput("y1"),
-          shiny::div(style = "position:absolute;right:2em;",
-            bsplus::bs_embed_tooltip(tag = shiny_iconlink("question "),
-            title = "Change the scale on the y-axis (upper plot).",
-            placement = "top",
-            expanded = TRUE
+          shiny::div(
+            style = "position:absolute;right:2em;",
+            bsplus::bs_embed_tooltip(
+              tag = shiny_iconlink("question "),
+              title = "Change the scale on the y-axis (upper plot).",
+              placement = "top",
+              expanded = TRUE
             )
           ),
           ####... 45. plot_type2 (uiOutput)####
           shiny::uiOutput("plot_type2"),
-          shiny::div(style = "position:absolute;right:2em;",
-            bsplus::bs_embed_tooltip(tag = shiny_iconlink("question"),
-            title = "Change the y-axis limits (upper plot).",
-            placement = "top",
-            expanded = TRUE
+          shiny::div(
+            style = "position:absolute;right:2em;",
+            bsplus::bs_embed_tooltip(
+              tag = shiny_iconlink("question"),
+              title = "Change the y-axis limits (upper plot).",
+              placement = "top",
+              expanded = TRUE
             )
           ),
           ####... 46. YRange2 (uiOutput)####
@@ -1162,29 +1163,35 @@ ui <- shiny::navbarPage(
           id = "myid3",
           ####... 47. cont_well3 (uiOutput)####
           shiny::uiOutput('cont_well3'),
-          shiny::div(style = "position:absolute;right:2em;",
-            bsplus::bs_embed_tooltip(tag = shiny_iconlink("question "),
-            title = "Variable t obe plotted on the y-axis (lower plot).",
-            placement = "top",
-            expanded = TRUE
+          shiny::div(
+            style = "position:absolute;right:2em;",
+            bsplus::bs_embed_tooltip(
+              tag = shiny_iconlink("question "),
+              title = "Variable t obe plotted on the y-axis (lower plot).",
+              placement = "top",
+              expanded = TRUE
             )
           ),
           ####... 48. y2 (uiOutput)####
           shiny::uiOutput("y2"),
-          shiny::div(style = "position:absolute;right:2em;",
-            bsplus::bs_embed_tooltip(tag = shiny_iconlink("question "),
-            title = "Change the scale on the y-axis (lower plot).",
-            placement = "top",
-            expanded = TRUE
+          shiny::div(
+            style = "position:absolute;right:2em;",
+            bsplus::bs_embed_tooltip(
+              tag = shiny_iconlink("question "),
+              title = "Change the scale on the y-axis (lower plot).",
+              placement = "top",
+              expanded = TRUE
             )
           ),
           ####... 49. plot_type3 (uiOutput)####
           shiny::uiOutput("plot_type3"),
-          shiny::div(style = "position:absolute;right:2em;",
-            bsplus::bs_embed_tooltip(tag = shiny_iconlink("question "),
-            title = "Change y-axis limits (lower plot).",
-            placement = "top",
-            expanded = TRUE
+          shiny::div(
+            style = "position:absolute;right:2em;",
+            bsplus::bs_embed_tooltip(
+              tag = shiny_iconlink("question "),
+              title = "Change y-axis limits (lower plot).",
+              placement = "top",
+              expanded = TRUE
             )
           ),
           ####... 50. YRange3 (uiOutput)####
@@ -1206,7 +1213,7 @@ ui <- shiny::navbarPage(
           ),
           ####... 52. x2 (uiOutput)####
           shiny::uiOutput("x2")
-        ),
+        )
       ),
       shiny::mainPanel(
         shiny::tabsetPanel(type = "tabs",
@@ -1501,7 +1508,8 @@ server <- function(input, output, session) {
 
   plot_points_data_complement <- shiny::reactive({
     shiny::req(input$y)
-    if (input$y != "N.of.subjects" & any(startsWith(colnames(scresults$sge),"Complement_"))) {
+    if (input$y != "N.of.subjects" & any(startsWith(colnames(scresults$sge),"Complement_"))
+      & !is.null(input$selectedSG_rows_selected)) {
       IDs <- click_points_data$xy[input$selectedSG_rows_selected,]$SGID
       data.frame(
         x = scresults$results_total$N.of.subjects - scresults$sge[which(scresults$sge ==IDs),  c(input$x)],
@@ -1914,7 +1922,7 @@ server <- function(input, output, session) {
       tmp <- DT::datatable(
         data = df_par,
         extensions = 'Buttons',
-        options = list(initComplete = JS(
+        options = list(initComplete = DT::JS(
           "function(settings, json) {",
           paste0("$(this.api().table().header()).css({'background-color': '",
                  colthemeCol$col.bg,
@@ -2608,7 +2616,7 @@ server <- function(input, output, session) {
           data = df_fac,
           extensions = 'Buttons',
           options = list(
-            initComplete = JS(
+            initComplete = DT::JS(
               "function(settings, json) {",
               paste0("$(this.api().table().header()).css({'background-color': '",
                      colthemeCol$col.bg,
@@ -3421,7 +3429,7 @@ server <- function(input, output, session) {
         data = df_fac,
         extensions = 'Buttons',
         options = list(
-          initComplete = JS(
+          initComplete = DT::JS(
            "function(settings, json) {",
            paste0("$(this.api().table().header()).css({'background-color': '",
                   colthemeCol$col.bg,
@@ -3524,7 +3532,7 @@ server <- function(input, output, session) {
         data = df_filt ,
         extensions = 'Buttons',
         options = list(
-          initComplete = JS(
+          initComplete = DT::JS(
             "function(settings, json) {",
             paste0("$(this.api().table().header()).css({'background-color': '",
               colthemeCol$col.bg,
@@ -3622,7 +3630,7 @@ server <- function(input, output, session) {
         data = dat,
         extensions = 'Buttons',
         options= list(
-          initComplete = JS(
+          initComplete = DT::JS(
             "function(settings, json) {",
             paste0("$(this.api().table().header()).css({'background-color': '",
                    colthemeCol$col.bg,
@@ -3699,7 +3707,8 @@ server <- function(input, output, session) {
     if(!is.null(input$select_button)){
       selectedRow <- as.numeric(strsplit(input$select_button, "_")[[1]][2])
       del <- cbind(data.frame(
-        Delete = shinyInput_remove(actionButton, 1, 'button_', label = "Remove",
+        Delete = shinyInput_remove(
+          actionButton, 1, 'button_', label = "Remove",
                                    onclick = 'Shiny.onInputChange(\"remove_button\",  this.id)' )
       ),
       click_points_data$xy[click_points_data$xy$SGID == selectedRow, ])
@@ -3718,7 +3727,7 @@ server <- function(input, output, session) {
       escape = FALSE,
       selection = 'none',
       options = list(
-        initComplete = JS(
+        initComplete = DT::JS(
           "function(settings, json) {",
           paste0("$(this.api().table().header()).css({'background-color': '",
             colthemeCol$col.bg,
@@ -3884,7 +3893,7 @@ server <- function(input, output, session) {
       selection = 'none',
       extensions = 'Buttons',
       options = list(
-        initComplete = JS(
+        initComplete = DT::JS(
           "function(settings, json) {",
           paste0("$(this.api().table().header()).css({'background-color': '",
                  colthemeCol$col.bg,
@@ -4732,7 +4741,7 @@ server <- function(input, output, session) {
     )
   })
 
-  ####... 68. mosaic ####
+ ####... 68. mosaic ####
   output$mosaic <- shiny::renderPlot({
     mos.x <- shiny::req(input$var1)
     mos.y <- shiny::req(input$var2)
@@ -4758,8 +4767,9 @@ server <- function(input, output, session) {
         mos.y2 <- NULL
       }
     }
+
     tmp <- scresults$sge[scresults$sge$nfactors == 1 & !scresults$sge[, mos.x] %in% not.used, ]
-    tmp <- arrange_(tmp, .dots = c(mos.x))
+    tmp <- dplyr::arrange(tmp, !!rlang::sym(mos.x))
     prop.x <- cumsum(tmp[, 'N.of.subjects'])
     prop.x <- c(0,prop.x) / max(prop.x)
     mid.x <- (prop.x[-length(prop.x)] + prop.x[-1])/2
@@ -4768,7 +4778,7 @@ server <- function(input, output, session) {
     mid.y <- 0.5
     if (!is.null(mos.y)) {
       tmp <- scresults$sge[scresults$sge$nfactors == 1 & !scresults$sge[, mos.y] %in% not.used, ]
-      tmp <- arrange_(tmp, .dots = c(mos.y))
+      tmp <- dplyr::arrange(tmp, !!rlang::sym(mos.y))
       prop.y <- cumsum(tmp[, 'N.of.subjects'])
       prop.y <- c(0,prop.y) / max(prop.y)
       mid.y <- (prop.y[-length(prop.y)] + prop.y[-1])/2
@@ -4776,7 +4786,7 @@ server <- function(input, output, session) {
       if (!is.null(mos.y2)) {
         tmp <- scresults$sge[scresults$sge$nfactors == 2 & !scresults$sge[, mos.y] %in% not.used &
                                !scresults$sge[, mos.y2] %in% not.used, ]
-        tmp <- arrange_(tmp, .dots = c(mos.y,mos.y2))
+        tmp <- dplyr::arrange(tmp, !!!rlang::syms(c(mos.y,mos.y2)))
         prop.y <- cumsum(tmp[, 'N.of.subjects'])
         prop.y <- c(0, prop.y)/max(prop.y)
         mid.y <- (prop.y[-length(prop.y)] + prop.y[-1])/2
@@ -4811,7 +4821,7 @@ server <- function(input, output, session) {
     comb.full <- unique(expand.grid(tmp[, c(mos.x, mos.y, mos.y2), drop = FALSE]))
     tmp <- merge(tmp, comb.full, all.y = TRUE)
 
-    tmp <- arrange_(tmp, .dots = c(mos.x, mos.y, mos.y2))
+    tmp <- dplyr::arrange(tmp, !!!rlang::syms(c(mos.y, mos.y2)))
     if(shiny::req(input$logmosaic) == "lin") {
       val.z <- matrix(tmp[, mos.z], ncol = length(prop.x) - 1, byrow = FALSE)
     }
@@ -4984,7 +4994,7 @@ server <- function(input, output, session) {
       }
 
       tmp <- scresults$sge[scresults$sge$nfactors == 1 & !scresults$sge[,mos.x] %in% not.used, ]
-      tmp <- arrange_(tmp, .dots = c(mos.x))
+      tmp <- dplyr::arrange(tmp, !!rlang::sym(mos.x))
       prop.x <- cumsum(tmp[, 'N.of.subjects'])
       prop.x <- c(0, prop.x) / max(prop.x)
       mid.x <- (prop.x[-length(prop.x)] + prop.x[-1]) / 2
@@ -4996,7 +5006,7 @@ server <- function(input, output, session) {
       if (!is.null(mos.y)) {
         if (is.null(mos.y2)) {
           tmp <- scresults$sge[scresults$sge$nfactors == 1 & !scresults$sge[, mos.y] %in% not.used, ]
-          tmp <- arrange_(tmp, .dots = c(mos.y))
+          tmp <- dplyr::arrange(tmp, !!rlang::sym(mos.y))
           prop.y <- cumsum(tmp[, 'N.of.subjects'])
           prop.y <- c(0, prop.y) / max(prop.y)
           mid.y <- (prop.y[-length(prop.y)] + prop.y[-1]) / 2
@@ -5007,7 +5017,7 @@ server <- function(input, output, session) {
         } else {
           tmp <- scresults$sge[scresults$sge$nfactors == 2 & !scresults$sge[, mos.y] %in% not.used &
                                  !scresults$sge[,mos.y2] %in% not.used, ]
-          tmp <- arrange_(tmp, .dots = c(mos.y, mos.y2))
+          tmp <- dplyr::arrange(tmp, !!!rlang::syms(c(mos.y, mos.y2)))
           prop.y <- cumsum(tmp[, 'N.of.subjects'])
           prop.y <- c(0, prop.y) / max(prop.y)
           mid.y <- (prop.y[-length(prop.y)] + prop.y[-1]) / 2
@@ -5032,7 +5042,7 @@ server <- function(input, output, session) {
 
       tmp <- merge(tmp, comb.full, all.y = TRUE)
 
-      tmp <- arrange_(tmp, .dots = c(mos.x, mos.y, mos.y2))
+      tmp <- dplyr::arrange(tmp, !!!rlang::syms(c(mos.x, mos.y, mos.y2)))
 
       col.disp <- unique(c(mos.x, mos.y, mos.y2, setdiff(colnames(tmp), c(scresults$factors, 'nfactors'))))
 
@@ -5276,9 +5286,11 @@ server <- function(input, output, session) {
       lwd = 3,
       col = colthemeCol$ColorReference
     )
+
     graphics::text(
       x = graphics::grconvertX(0.97, from = 'nfc', to = 'user'),
       y = ref_line() + diff(input$YRange)/50,
+      paste0(shiny::isolate(ref_line())),
       col = colthemeCol$ColorReference
     )
 

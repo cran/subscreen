@@ -35,10 +35,6 @@ subscreenshow <- function (scresults,
     cat("Error: subscreenshow requires the package bsplus to be installed")
     stop()
   }
-  if (!requireNamespace("V8", quietly = TRUE)) {
-    cat("Error: subscreenshow requires the package V8 to be installed")
-    stop()
-  }
   if (!requireNamespace("jsonlite", quietly = TRUE)) {
     cat("Error: subscreenshow requires the package jsonlite to be installed")
     stop()

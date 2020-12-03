@@ -78,8 +78,6 @@
 #'#variable importance for OS for the created categorical variables
 #'#(higher is more important, also works for numeric variables)
 #' varnames <- c('ageg', 'sex', 'bilig', 'cholg', 'astg', 'albuming', 'phosg')
-#' results.vi <- subscreenvi(data=pbcdat, y=c('timeos','timepfs'),
-#'  cens='event.os', trt='trt', x=varnames)
 #' # define function the eval_function()
 #' # Attention: The eval_function ALWAYS needs to return a dataframe with one row.
 #' #            Include exception handling, like if(N1>0 && N2>0) hr <- exp(coxph(...) )
@@ -110,10 +108,9 @@
 #'                      endpoints = c("timepfs" , "event.pfs", "timeos", "event.os"),
 #'                      treat="trt",
 #'                      subjectid = "id",
-#'                      factors=c("ageg", "sex", "bilig", "cholg", "copperg", "astg",
-#'                                "albuming", "phosg"),
+#'                      factors=c("ageg", "sex", "bilig", "cholg", "copperg"),
 #'                      use_complement = FALSE,
-#'                      factorial = TRUE)
+#'                      factorial = FALSE)
 #'
 #' # visualize the results of the subgroup screening with a Shiny app
 #' subscreenshow(results)}
@@ -298,6 +295,96 @@ subscreencalc <- function(
     H <- cbind(H, Compl[-1])
   }
 
+  evfu <- eval_function(cbind(FFF, TTT))
+  N <- data.frame('N.of.subjects' = sum(!is.na(cbind(TTT,FFF)[subjectid])))
+  res <- merge(evfu, N)
+
+  if (factorial == TRUE) {
+
+    pseudo <- function(fc) {
+      mz <- apply(fc, 1, function(r) any(is.na(r)))
+      rc <- fc[!mz, , drop = FALSE]
+      h <- names(rc) %in% names(data)[which(colnames(data) %in% factors)]
+      fn <- names(rc)[h]
+      fl <- lapply(fn, function(n) unique(rc[, n]))
+      names(fl) <- fn
+      cc <- domain(fl)
+      h <- dim(rc) == dim(cc) && all(rc[, fn, drop = FALSE] == cc)
+      if(h) rc else NULL
+    }
+
+    domain <- function(V) {
+      i <- length(V) - 1
+      while (i > 0) {
+        lle=length(V[[i]]);
+        lri=length(V[[i+1]])
+        j=length(V)
+        while (j > i){
+          V[[j]]=rep(V[[j]],lle)
+          j=j-1
+        }
+        V[[i]]=rep(V[[i]],rep(lri,lle))
+        i=i-1
+      }
+      as.data.frame(V)
+    }
+
+    factorial_context <- function(data, response){
+
+       pos_factors <- which(colnames(data) %in% factors)
+       pos_no_factors <- which(!colnames(data) %in% factors)
+
+      i <- 1
+      j <- 1
+      k <- 1
+      l <- 1
+      p <- 1
+      data$FCID_all <- numeric(dim(data)[1])
+      data$FCID_complete <- numeric(dim(data)[1])
+      data$FCID_incomplete <- numeric(dim(data)[1])
+      data$FCID_pseudo <- numeric(dim(data)[1])
+      while (i <= nrow(data)) {
+        sg <- data[i,]
+
+        un <- data[i,pos_factors[which(data[i, pos_factors] != "Not used")], drop = FALSE]
+        nn <- data[i,pos_factors[which(data[i, pos_factors] == "Not used")], drop = FALSE]
+
+        N <- lapply(un, function(k) {h = levels(k); h[h != "Not used"]})
+        d <- domain(N)
+        rownames(nn) <- NULL
+        dd <- cbind(d,nn)
+        F. <- merge(dd, data[i:(i + nrow(dd)), ], all.x = TRUE)
+        data$FCID_all[data$SGID %in% F.$SGID] <- j
+        A <- F.[, !(colnames(F.) %in% colnames(nn))]
+        if (all(!is.na(A))) {
+          data$FCID_complete[data$SGID %in% F.$SGID] <- k
+          data$FCID_incomplete[data$SGID %in% F.$SGID] <- "Complete"
+          k <- k + 1
+        } else {
+          pse <- pseudo(A)
+          if (!is.null(pse)) {
+            data$FCID_pseudo[data$SGID %in% pse$SGID] <- p
+            p <- p + 1
+          }
+          data$FCID_complete[data$SGID %in% F.$SGID] <- "Not complete"
+          data$FCID_incomplete[data$SGID %in% F.$SGID] <- l
+
+          l <- l + 1
+        }
+        i <- i + sum(!is.na(A$SGID))
+        j <- j + 1
+      }
+
+      data$FCID_pseudo[data$FCID_pseudo == 0] <- "No Pseudo"
+
+      return(data)
+    }
+
+    fc <- factorial_context(H, response = colnames(H)[!colnames(H) %in% c(factors,"SGID","nfactors")])
+  } else {
+    fc <- H
+  }
+
   pt3 <- proc.time()
   z = numeric()
   for (i in 1:length(h)) z[i] = dim(h[[i]])[1]
@@ -314,97 +401,6 @@ subscreencalc <- function(
               round((pt3 - pt0)[3]%%60, digits = 4), sep = ":"),
         "\n")
   }
-
-  evfu <- eval_function(cbind(FFF, TTT))
-  N <- data.frame('N.of.subjects' = sum(!is.na(cbind(TTT,FFF)[subjectid])))
-  res <- merge(evfu, N)
-
-  if (factorial == TRUE) {
-
-  pseudo <- function(fc) {
-    mz <- apply(fc, 1, function(r) any(is.na(r)))
-    rc <- fc[!mz, , drop = FALSE]
-    h <- names(rc) %in% names(data)[which(colnames(data) %in% factors)]
-    fn <- names(rc)[h]
-    fl <- lapply(fn, function(n) unique(rc[, n]))
-    names(fl) <- fn
-    cc <- domain(fl)
-    h <- dim(rc) == dim(cc) && all(rc[, fn, drop = FALSE] == cc)
-    if(h) rc else NULL
-  }
-
-  domain <- function(V) {
-    i <- length(V) - 1
-    while (i > 0) {
-      lle=length(V[[i]]);
-      lri=length(V[[i+1]])
-      j=length(V)
-      while (j > i){
-        V[[j]]=rep(V[[j]],lle)
-        j=j-1
-      }
-      V[[i]]=rep(V[[i]],rep(lri,lle))
-      i=i-1
-    }
-    as.data.frame(V)
-  }
-
-  factorial_context <- function(data, response){
-
-     pos_factors <- which(colnames(data) %in% factors)
-     pos_no_factors <- which(!colnames(data) %in% factors)
-
-    i <- 1
-    j <- 1
-    k <- 1
-    l <- 1
-    p <- 1
-    data$FCID_all <- numeric(dim(data)[1])
-    data$FCID_complete <- numeric(dim(data)[1])
-    data$FCID_incomplete <- numeric(dim(data)[1])
-    data$FCID_pseudo <- numeric(dim(data)[1])
-    while (i <= nrow(data)) {
-      sg <- data[i,]
-
-      un <- data[i,pos_factors[which(data[i, pos_factors] != "Not used")], drop = FALSE]
-      nn <- data[i,pos_factors[which(data[i, pos_factors] == "Not used")], drop = FALSE]
-
-      N <- lapply(un, function(k) {h = levels(k); h[h != "Not used"]})
-      d <- domain(N)
-      rownames(nn) <- NULL
-      dd <- cbind(d,nn)
-      F. <- merge(dd, data[i:(i + nrow(dd)), ], all.x = TRUE)
-      data$FCID_all[data$SGID %in% F.$SGID] <- j
-      A <- F.[, !(colnames(F.) %in% colnames(nn))]
-      if (all(!is.na(A))) {
-        data$FCID_complete[data$SGID %in% F.$SGID] <- k
-        data$FCID_incomplete[data$SGID %in% F.$SGID] <- "Complete"
-        k <- k + 1
-      } else {
-        pse <- pseudo(A)
-        if (!is.null(pse)) {
-          data$FCID_pseudo[data$SGID %in% pse$SGID] <- p
-          p <- p + 1
-        }
-        data$FCID_complete[data$SGID %in% F.$SGID] <- "Not complete"
-        data$FCID_incomplete[data$SGID %in% F.$SGID] <- l
-
-        l <- l + 1
-      }
-      i <- i + sum(!is.na(A$SGID))
-      j <- j + 1
-    }
-
-    data$FCID_pseudo[data$FCID_pseudo == 0] <- "No Pseudo"
-
-    return(data)
-  }
-
-
-  fc <- factorial_context(H, response = colnames(H)[!colnames(H) %in% c(factors,"SGID","nfactors")])
-  } else {
-  fc <- H
-}
 
   H <- list(sge = fc, max_comb = max_comb, min_comb = min_comb,
             subjectid = subjectid, endpoints = endpoints, treat = treat,
