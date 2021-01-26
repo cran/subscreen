@@ -273,10 +273,8 @@ subscreencalc <- function(
     h <- parallel::parLapplyLB(cl = clus, 1:rowsM, sugruCalc)
     parallel::stopCluster(clus)
 
-  }else {
-
+  } else {
     h <- sapply(1:rowsM, sugruCalc, simplify = FALSE)
-
   }
   pt2 <- proc.time()
 

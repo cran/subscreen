@@ -2535,7 +2535,7 @@ server <- function(input, output, session) {
 
     pch_ <- ifelse(input$pch_value == "19", 19, input$pch_value)
 
-    if(shiny::isolate(input$circlestyle) == "standard"){
+    if(shiny::isolate(input$circlestyle) == "standard") {
       graphics::points(white_points$x, white_points$y, pch = pch_, cex = shiny::isolate(input$pointsize), col = white_points$color)
       graphics::points(colored_points$x, colored_points$y, pch = pch_, cex = shiny::isolate(input$pointsize), col = colored_points$color)
     }
@@ -2569,7 +2569,7 @@ server <- function(input, output, session) {
 
   ####... 34. cont_well5 ####
   output$header1 <- shiny::renderUI({
-    shiny::req(screening_index$val)
+    shiny::req(screening_index_new$val)
     shiny::tags$h5(
       id = "header4",
       paste0("Subgroup: ", screening_index_new$val)
@@ -2577,6 +2577,7 @@ server <- function(input, output, session) {
   })
 
   output$header2 <- shiny::renderUI({
+    input$y
     shiny::req(screening_index$val)
     tmp1 <- colnames(scresults$sge[which(scresults$sge$SGID == screening_index_new$val), scresults$factors])[which(scresults$sge[which(scresults$sge$SGID == screening_index_new$val), scresults$factors] != "Not used")]
     tmp2 <- scresults$sge %>%
@@ -3171,8 +3172,9 @@ server <- function(input, output, session) {
   })
 
   output$cont_well10  <- shiny::renderUI({
-   shiny::tags$head(
-     shiny::tags$style(
+
+    shiny::tags$head(
+      shiny::tags$style(
         type = 'text/css',
         paste0(
           ".myclass10 {background-color: ",
@@ -4218,7 +4220,8 @@ server <- function(input, output, session) {
     )
 
     abline(
-      h = ref_line(),
+      #h = ref_line(),
+      h = scresults$results_total[, c(input$y1)],
       lwd = 3,
       col = colthemeCol$ColorReference
     )
@@ -4244,8 +4247,8 @@ server <- function(input, output, session) {
 
     text(
       x = graphics::grconvertX(0.97, from = 'npc', to = 'user'),
-      y = graphics::grconvertY(0.06, from = 'nfc', to = 'user') + ref_line(),
-      paste0(ref_line()), col = colthemeCol$ColorReference
+      y = graphics::grconvertY(0.06, from = 'nfc', to = 'user') + scresults$results_total[, c(input$y1)],
+      paste0(scresults$results_total[, c(input$y1)]), col = colthemeCol$ColorReference
     )
 
     graphics::points(shiny::isolate(plot_points_data_complement()),
@@ -5752,7 +5755,7 @@ server <- function(input, output, session) {
 
   screening_index_new <- shiny::reactiveValues(val = NULL)
 
-  shiny::observeEvent(c(screening_index$val,input$direction), {
+  shiny::observeEvent(c(screening_index$val,input$direction, input$y), {
    shiny::req(sorting_index())
     sort_ind <- sorting_index()
     screening_index_new$val <- sort_ind[screening_index$val]
@@ -5780,6 +5783,8 @@ server <- function(input, output, session) {
     }
   })
   }
+
+
   #### MODULE ####
   if (all(c("FCID_all", "FCID_complete", "FCID_incomplete", "FCID_pseudo") %in% colnames(scresults$sge))) {
   Module_input <- shiny::reactiveValues(

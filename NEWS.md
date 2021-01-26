@@ -121,3 +121,13 @@
 ## Bug fix Subscreen ASMUS-tab
 * label for reference line corrected
 
+# subscreen 3.0.3
+
+## Bug fix Subscreen Comparer-tab
+* label for top reference line corrected
+
+## Bug fix Subscreen ASMUS-tab
+* fixed initial subgroup information text reactivity after target variable change
+
+## subscreencalc
+* calculation of complement included in regular calculation step to improve computing time
