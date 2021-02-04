@@ -129,5 +129,9 @@
 ## Bug fix Subscreen ASMUS-tab
 * fixed initial subgroup information text reactivity after target variable change
 
+# subscreen 3.0.4
+
 ## subscreencalc
-* calculation of complement included in regular calculation step to improve computing time
+* optimized calculation of complement included in regular calculation step to reduce computing time
+* stepwise verbose output with additional details
+

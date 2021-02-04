@@ -1,13 +1,13 @@
-c6e5b6afe93380c4f04a0652eef38457 *DESCRIPTION
+d6dc09e9a98160f25d8aa10c713ce0a9 *DESCRIPTION
 df4eaaaf98479f26b5725c570f80faa9 *NAMESPACE
-ce23be66cade6c472b642bec8ea2e899 *NEWS.md
+100226fb7139e4822f9edf41e062e036 *NEWS.md
 66283159ed36aa3b9e8b598a5eb72017 *R/subscreen.R
-34704b3882c2262d96308e125440bce6 *R/subscreencalc.R
+10bcc0859e35cc4641edf49418831a37 *R/subscreencalc.R
 0e3fc2e8668051b4ae2329c18cbcd352 *R/subscreenshow.R
 a36b425d6e3583bd2cf7ca9556cfc2a0 *R/subscreenvi.R
 b1774a3232ff29aa8f82f3dd409a361b *R/zzz.R
 0692402e16ad4d3367e4a0e3d208fe3b *build/vignette.rds
-0e747bc8b4a555b1d6a6fc95f3ccf658 *inst/doc/subscreen.html
+8563e6efd68408eb9a257227ecd7475e *inst/doc/subscreen.html
 41a42d2d15c9150cfcb456564438e4eb *inst/doc/subscreen.rmd
 df792596d8b7b381b37f10eb95fb0ef1 *inst/shiny-app/subscreen/app.R
 f224812af4b22adb7597b0015376380a *inst/www/subscreen_logo.png

@@ -182,10 +182,16 @@ subscreencalc <- function(
     S = character()
     S = append(S, names(FFF)[(1:length(m)) * m])
     d = plyr::ddply(cbind(FFF, TTT), S, eval_function)
+    if(use_complement == TRUE) {
+      d_comp = plyr::ddply(cbind(FFF, TTT), S, function(x){eval_function(dplyr::anti_join(cbind(FFF,TTT), x))})
+      names(d_comp)[!names(d_comp) %in% S] <- paste0("Complement_",names(d_comp)[!names(d_comp) %in% S])
+    }
     d_N <- plyr::ddply(cbind(FFF,TTT),S,function(x){N.of.subjects <- sum(!is.na(x[subjectid]))
     data.frame(N.of.subjects)})
     d <- merge(d,d_N)
-
+    if(use_complement == TRUE) {
+      d <- merge(d,d_comp)
+    }
     nfactors = sum(m)
     h = cbind(nfactors, d)
     return(h)
@@ -226,19 +232,6 @@ subscreencalc <- function(
     return(cbind(SGID, H))
   }
 
-  complementCalc <- function(i) {
-    tmp2 <- tmp[i, which(H[i, colnames(H) %in% factors] != "Not used")]
-    if(length(tmp2) == 1){
-      colnam <- colnames(tmp)[which(H[i,colnames(H) %in% factors] != "Not used")]
-      tmp4 <- data[data[,colnam] != as.character(tmp2),]
-    }else{
-      tmp3 <- data[, colnames(data) %in% colnames(tmp2)]
-      ind <- apply(apply(tmp3, 1, '==', tmp2), 2, all)
-      tmp4 <- data[!ind, ]
-    }
-    return(eval_function(tmp4))
-  }
-
   TTT <- data[, (colnames(data) %in% c(subjectid, treat, endpoints))]
 
   if (is.null(factors)) {
@@ -253,6 +246,11 @@ subscreencalc <- function(
 
   }
 
+  if (verbose == TRUE) {
+    cat("\n",
+        "subscreencalc 3.0.4 started at ", format(Sys.time(), format = "%F %R %Z"))}
+
+
   AnFa <- dim(FFF)[2]
   AaS <- dim(data)[1]
   StAn <- apply(FFF, 2, function(x) length(table(x)))
@@ -261,6 +259,11 @@ subscreencalc <- function(
   AnSu <- sugruCount(M, StAn)
   pt1 <- proc.time()
   rowsM <- dim(M)[1]
+
+  if (verbose == TRUE) {
+    cat("\n", "Number of Subjects                     ",AaS,
+        "\n", "Number of Subgroup Factors             ",AnFa,
+        "\n", "Potential Subgroups                    ",sum(AnSu))}
 
   if (nkernel > 1) {
 
@@ -276,26 +279,34 @@ subscreencalc <- function(
   } else {
     h <- sapply(1:rowsM, sugruCalc, simplify = FALSE)
   }
+
+  z = numeric()
+
+  for (i in 1:length(h)) z[i] = dim(h[[i]])[1]
+
   pt2 <- proc.time()
+
+  if (verbose == TRUE) {
+    cat("\n", "Non-existent/empty Subgroups           ",sum(AnSu - z),
+        "\n", "Existent Subgroups                     ",sum(z),
+        "\n\n", "Time for SG Analyses (s)               ", pt2 - pt1)}
 
   H <- combineDataFrame(h)
 
-  if(use_complement == TRUE) {
+  pt3 <- proc.time()
 
-    tmp <- H[,colnames(H) %in% factors]
+  if (verbose == TRUE) {
+    cat("\n", "Time for creating Data Frames (s)      ", pt3 - pt2)}
 
-    compl <- sapply(1:dim(H)[1], complementCalc, simplify = FALSE)
-
-    Compl <- combineDataFrame(compl, version = 3)
-
-    colnames(Compl) <- paste0("Complement_", colnames(Compl))
-
-    H <- cbind(H, Compl[-1])
-  }
 
   evfu <- eval_function(cbind(FFF, TTT))
   N <- data.frame('N.of.subjects' = sum(!is.na(cbind(TTT,FFF)[subjectid])))
   res <- merge(evfu, N)
+
+  pt3a <- proc.time()
+
+  if (verbose == TRUE) {
+    cat("\n", "Time for calculating N.of.subjects (s) ", pt3a - pt3)}
 
   if (factorial == TRUE) {
 
@@ -383,20 +394,13 @@ subscreencalc <- function(
     fc <- H
   }
 
-  pt3 <- proc.time()
-  z = numeric()
-  for (i in 1:length(h)) z[i] = dim(h[[i]])[1]
+  pt4 <- proc.time()
+
   if (verbose == TRUE) {
-    cat("\n", "Number of Subjects                     ",
-        AaS, "\n", "Number of Subgroup Factors             ",
-        AnFa, "\n", "Potential Subgroups                    ",
-        sum(AnSu), "\n", "Non-existent/empty Subgroups           ",
-        sum(AnSu - z), "\n", "Existent Subgroups                     ",
-        sum(z), "\n\n", "Time for SG Analyses (s)               ",
-        pt2 - pt1, "\n", "Time for creating Data Frames (s)      ",
-        pt3 - pt2, "\n", "Overall time used (HH:MM:SS)           ",
-        paste(((pt3 - pt0)[3]/3600)%/%1, (((pt3 - pt0)[3]/60)%/%1)%%60,
-              round((pt3 - pt0)[3]%%60, digits = 4), sep = ":"),
+    cat("\n", "Time for factorial context (s)         ", pt4 - pt3a,
+        "\n", "Overall time used (HH:MM:SS)           ",
+        paste(((pt4 - pt0)[3]/3600)%/%1, (((pt4 - pt0)[3]/60)%/%1)%%60,
+              round((pt4 - pt0)[3]%%60, digits = 4), sep = ":"),
         "\n")
   }
 
@@ -404,6 +408,12 @@ subscreencalc <- function(
             subjectid = subjectid, endpoints = endpoints, treat = treat,
             factors = factors, results_total = res)
   class(H) <- "SubScreenResult"
+
+  if (verbose == TRUE) {
+    cat("\n",
+        "subscreencalc 3.0.4 stopped at ", format(Sys.time(), format = "%F %R %Z"), "\n")}
+
+
   H
 }
 
