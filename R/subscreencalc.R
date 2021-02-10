@@ -183,7 +183,7 @@ subscreencalc <- function(
     S = append(S, names(FFF)[(1:length(m)) * m])
     d = plyr::ddply(cbind(FFF, TTT), S, eval_function)
     if(use_complement == TRUE) {
-      d_comp = plyr::ddply(cbind(FFF, TTT), S, function(x){eval_function(dplyr::anti_join(cbind(FFF,TTT), x))})
+      d_comp = plyr::ddply(cbind(FFF, TTT), S, function(x){eval_function(dplyr::anti_join(cbind(FFF,TTT), x, by = colnames(FFF)))})
       names(d_comp)[!names(d_comp) %in% S] <- paste0("Complement_",names(d_comp)[!names(d_comp) %in% S])
     }
     d_N <- plyr::ddply(cbind(FFF,TTT),S,function(x){N.of.subjects <- sum(!is.na(x[subjectid]))

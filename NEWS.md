@@ -135,3 +135,8 @@
 * optimized calculation of complement included in regular calculation step to reduce computing time
 * stepwise verbose output with additional details
 
+# subscreen 3.0.5
+
+## subscreencalc
+* supress output of "joining by ..." while running R version 3.X.X
+
