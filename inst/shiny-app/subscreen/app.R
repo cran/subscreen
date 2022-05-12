@@ -639,7 +639,7 @@ ui <- shiny::navbarPage(
         "
       )
     ),
-    shinyWidgets::chooseSliderSkin("Nice", color = "#112446"),
+    shinyWidgets::chooseSliderSkin("Round", color = NULL),
     ####... 1. cont_nav (uiOutput)####
     shiny::uiOutput('cont_nav'),
     shiny::fluidPage(

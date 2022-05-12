@@ -140,3 +140,7 @@
 ## subscreencalc
 * supress output of "joining by ..." while running R version 3.X.X
 
+## subscreen 3.0.7
+* Remove R Package RandomForestSRC and use R Package ranger for random forest calculation in 
+function subscreenvi 
+* Change example in subscreenvi

@@ -13,17 +13,42 @@
 #'   (one for each treatment level, one with the ranking variability between the
 #'   treatment levels and one with the total results)
 #'
-#' @import randomForestSRC
+#' @import ranger
 #' @import plyr
 #' @import stats
 #' @keywords variable importance
 #' @export subscreenvi
 #' @examples
 #' \dontrun{
-#' require(survival)
-#' data(pbc)
-#' pbc$status <- ifelse(pbc$status==0,0,1)
-#' importance <- subscreenvi(data=pbc, y='time', cens='status', trt='trt', x=NULL)
+#'require(survival)
+#'data(pbc, package="survival")
+#'# generate categorical versions of some of the baseline covariates
+#'pbc$ageg[!is.na(pbc$age)]        <-
+#'   ifelse(pbc$age[!is.na(pbc$age)]          <= median(pbc$age,     na.rm=TRUE), "Low", "High")
+#'pbc$albuming[!is.na(pbc$albumin)]<-
+#'   ifelse(pbc$albumin[!is.na(pbc$albumin)]  <= median(pbc$albumin, na.rm=TRUE), "Low", "High")
+#'pbc$phosg[!is.na(pbc$alk.phos)]  <-
+#'   ifelse(pbc$alk.phos[!is.na(pbc$alk.phos)]<= median(pbc$alk.phos,na.rm=TRUE), "Low", "High")
+#'pbc$astg[!is.na(pbc$ast)]        <-
+#'   ifelse(pbc$ast[!is.na(pbc$ast)]          <= median(pbc$ast,     na.rm=TRUE), "Low", "High")
+#'pbc$bilig[!is.na(pbc$bili)]      <-
+#'   ifelse(pbc$bili[!is.na(pbc$bili)]        <= median(pbc$bili,    na.rm=TRUE), "Low", "High")
+#'pbc$cholg[!is.na(pbc$chol)]      <-
+#'   ifelse(pbc$chol[!is.na(pbc$chol)]        <= median(pbc$chol,    na.rm=TRUE), "Low", "High")
+#'pbc$copperg[!is.na(pbc$copper)]  <-
+#'   ifelse(pbc$copper[!is.na(pbc$copper)]    <= median(pbc$copper,  na.rm=TRUE), "Low", "High")
+#'pbc$ageg[is.na(pbc$age)]         <- "No Data"
+#'pbc$albuming[is.na(pbc$albumin)] <- "No Data"
+#'pbc$phosg[is.na(pbc$alk.phos)]   <- "No Data"
+#'pbc$astg[is.na(pbc$ast)]         <- "No Data"
+#'pbc$bilig[is.na(pbc$bili)]       <- "No Data"
+#'pbc$cholg[is.na(pbc$chol)]       <- "No Data"
+#'pbc$copperg[is.na(pbc$copper)]   <- "No Data"
+#'#eliminate treatment NAs
+#'pbcdat <- pbc[!is.na(pbc$trt), ]
+#' pbcdat$status <- ifelse(pbcdat$status==0,0,1)
+#' importance <- subscreenvi(data=pbcdat, y='time', cens='status',
+#'  trt='trt', x=c("ageg", "sex", "bilig", "cholg", "copperg"))
 #' }
 
 subscreenvi <- function(data, y, cens=NULL, x=NULL, trt=NULL, ...){
@@ -56,8 +81,10 @@ subscreenvi <- function(data, y, cens=NULL, x=NULL, trt=NULL, ...){
 
       for (i in 1:length(trt.lev)){
 
-        fit <- randomForestSRC::rfsrc(as.formula(mod.form[j]), data = data[data[, trt] == trt.lev[i], ], importance = TRUE)
-        vi <- sort(fit$importance, decreasing = TRUE)
+        fit <- ranger::ranger(as.formula(mod.form[j]), data = data[data[, trt] == trt.lev[i], ], importance = "permutation",num.trees = 1000)
+
+        vi <- sort(fit$variable.importance, decreasing = TRUE)
+
         res.df <- data.frame('Variable' = names(vi), 'Importance' = vi)
         rownames(res.df) <- NULL
         result[[paste0('VI.trt.', trt.lev[i])]] <- res.df
@@ -75,8 +102,10 @@ subscreenvi <- function(data, y, cens=NULL, x=NULL, trt=NULL, ...){
     result[['VI.RV.trt']] <- tmp[, c('Variable', 'Importance')]
 
     # fit random forest for total data set and save variable importance
-    fit <- randomForestSRC::rfsrc(as.formula(paste0(mod.form[j], '+', trt)), data = data, importance = TRUE)
-    vi <- sort(fit$importance, decreasing = TRUE)
+    fit <- ranger::ranger(as.formula(mod.form[j]), data = data[data[, trt] == trt.lev[i], ], importance = "permutation",num.trees = 1000)
+
+    vi <- sort(fit$variable.importance, decreasing = TRUE)
+
     res.df <- data.frame('Variable' = names(vi), 'Importance' = vi)
     rownames(res.df) <- NULL
     result[['VI.total']] <- res.df[res.df$Variable != trt, ]

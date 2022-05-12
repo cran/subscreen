@@ -248,7 +248,7 @@ subscreencalc <- function(
 
   if (verbose == TRUE) {
     cat("\n",
-        "subscreencalc 3.0.4 started at ", format(Sys.time(), format = "%F %R %Z"))}
+        "subscreencalc started at ", format(Sys.time(), format = "%F %R %Z"))}
 
 
   AnFa <- dim(FFF)[2]
@@ -411,7 +411,7 @@ subscreencalc <- function(
 
   if (verbose == TRUE) {
     cat("\n",
-        "subscreencalc 3.0.4 stopped at ", format(Sys.time(), format = "%F %R %Z"), "\n")}
+        "subscreencalc stopped at ", format(Sys.time(), format = "%F %R %Z"), "\n")}
 
 
   H

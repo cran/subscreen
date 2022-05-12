@@ -13,6 +13,7 @@
 #' @param NiceNumbers list of numbers used for a 'nice' scale
 #' @keywords subgroup analysis visualization
 #' @import shiny
+#' @import shinyWidgets
 #' @export subscreenshow
 
 subscreenshow <- function (scresults,

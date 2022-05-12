@@ -1,7 +1,7 @@
 Package: subscreen
 Type: Package
 Title: Systematic Screening of Study Data for Subgroup Effects
-Version: 3.0.5
+Version: 3.0.7
 Author: Bodo Kirsch, Steffen Jeske, Susanne Lippert, Thomas Schmelter, Christoph Muysers, Hermann Kulmann
 Maintainer: Bodo Kirsch <bodo.kirsch@bayer.com>
 Description: Identifying outcome relevant subgroups has now become as simple as possible! The formerly lengthy and tedious search for the needle in a haystack will be replaced by a single, comprehensive and coherent presentation.
@@ -18,14 +18,13 @@ Description: Identifying outcome relevant subgroups has now become as simple as 
  New to version 3 is the Automatic Screening of one- or MUlti-factorial Subgroups (ASMUS) for documentation of the structured review of subgroup findings.
 License: GPL-3
 Encoding: UTF-8
-LazyData: TRUE
 Imports: utils, plyr, data.table, grDevices, graphics, shiny, DT,
-        stats, shinyjs, bsplus, jsonlite, colourpicker, dplyr,
-        randomForestSRC, purrr, shinyWidgets
+        stats, shinyjs, bsplus, jsonlite, colourpicker, dplyr, ranger,
+        purrr, shinyWidgets
 Suggests: parallel, survival, knitr, rmarkdown
 NeedsCompilation: no
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
-Packaged: 2021-02-09 20:49:09 UTC; sgfpj
+Packaged: 2022-05-12 09:01:40 UTC; SGFPJ
 Repository: CRAN
-Date/Publication: 2021-02-10 11:50:03 UTC
+Date/Publication: 2022-05-12 22:00:03 UTC
