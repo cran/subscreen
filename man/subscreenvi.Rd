@@ -4,7 +4,7 @@
 \alias{subscreenvi}
 \title{(iii) Determine variable importance}
 \usage{
-subscreenvi(data, y, cens = NULL, x = NULL, trt = NULL, ...)
+subscreenvi(data, y, cens = NULL, x = NULL, trt = NULL)
 }
 \arguments{
 \item{data}{The data frame containing the dependent and independent variables.}
@@ -16,8 +16,6 @@ subscreenvi(data, y, cens = NULL, x = NULL, trt = NULL, ...)
 \item{x}{Vector that contains the names of the columns in \code{data} with the independent variables (default=NULL, i.e. all remaining variables)}
 
 \item{trt}{The name of the column in \code{data} that contains the treatment variable (default=NULL).}
-
-\item{...}{additional arguments to be passed to function \code{rfsrc}}
 }
 \value{
 A list containing ordered data frames with the variable importances

@@ -8,7 +8,6 @@
 #' @param cens The name of the column in \code{data} that contains the censoring variable, if \code{y} is an event time (default=NULL).
 #' @param trt The name of the column in \code{data} that contains the treatment variable (default=NULL).
 #' @param x Vector that contains the names of the columns in \code{data} with the independent variables (default=NULL, i.e. all remaining variables)
-#' @param ... additional arguments to be passed to function \code{rfsrc}
 #' @return A list containing ordered data frames with the variable importances
 #'   (one for each treatment level, one with the ranking variability between the
 #'   treatment levels and one with the total results)
@@ -51,10 +50,10 @@
 #'  trt='trt', x=c("ageg", "sex", "bilig", "cholg", "copperg"))
 #' }
 
-subscreenvi <- function(data, y, cens=NULL, x=NULL, trt=NULL, ...){
+subscreenvi <- function(data, y, cens = NULL, x = NULL, trt = NULL) {
   Importance <- NULL
   # transform character to factor
-  if(any(sapply(data, is.character))){
+  if (any(sapply(data, is.character))) {
     data[sapply(data, is.character)] <- lapply(data[sapply(data, is.character)], factor)
   }
 
@@ -81,7 +80,12 @@ subscreenvi <- function(data, y, cens=NULL, x=NULL, trt=NULL, ...){
 
       for (i in 1:length(trt.lev)){
 
-        fit <- ranger::ranger(as.formula(mod.form[j]), data = data[data[, trt] == trt.lev[i], ], importance = "permutation",num.trees = 1000)
+        fit <- ranger::ranger(
+          as.formula(mod.form[j]),
+          data = data[data[, trt] == trt.lev[i], ],
+          importance = "permutation",
+          num.trees = 1000
+        )
 
         vi <- sort(fit$variable.importance, decreasing = TRUE)
 
@@ -98,17 +102,8 @@ subscreenvi <- function(data, y, cens=NULL, x=NULL, trt=NULL, ...){
     # summarize trt level results: rank variability over treatment levels
     tmp <- plyr::join_all(tmp, by = 'Variable', type = 'full')
     tmp$'Importance' <- apply(tmp[,-1], MARGIN = 1, FUN = var)
-    tmp <- arrange(tmp, desc(Importance))
+    tmp <- plyr::arrange(tmp, plyr::desc(Importance))
     result[['VI.RV.trt']] <- tmp[, c('Variable', 'Importance')]
-
-    # fit random forest for total data set and save variable importance
-    fit <- ranger::ranger(as.formula(mod.form[j]), data = data[data[, trt] == trt.lev[i], ], importance = "permutation",num.trees = 1000)
-
-    vi <- sort(fit$variable.importance, decreasing = TRUE)
-
-    res.df <- data.frame('Variable' = names(vi), 'Importance' = vi)
-    rownames(res.df) <- NULL
-    result[['VI.total']] <- res.df[res.df$Variable != trt, ]
 
     outcome[[j]] <- result$VI.RV.trt
   }

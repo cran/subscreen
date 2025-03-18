@@ -7,17 +7,15 @@
 subscreencalc(
   data,
   eval_function,
-  endpoints,
-  treat = "trtp",
   subjectid = "subjid",
   factors = NULL,
-  min_comb = 1,
   max_comb = 3,
   nkernel = 1,
   par_functions = "",
   verbose = TRUE,
   factorial = FALSE,
-  use_complement = FALSE
+  use_complement = FALSE,
+  ...
 )
 }
 \arguments{
@@ -25,15 +23,9 @@ subscreencalc(
 
 \item{eval_function}{name of the function for data analysis}
 
-\item{endpoints}{vector containing the names of the endpoint variables in data}
-
-\item{treat}{name of variable in data that contains the treatment identfier, defaults to trtp}
-
 \item{subjectid}{name of variable in data that contains the subject identifier, defaults to subjid}
 
-\item{factors}{vector containg the names of variables that define the subgroups, defaults to NULL. If set to NULL, all variables in data are used that are not included in subjectid, treat, and endpoints}
-
-\item{min_comb}{minimum number of factor combination levels to define subgroups, defaults to 1}
+\item{factors}{character vector containing the names of variables that define the subgroups (required)}
 
 \item{max_comb}{maximum number of factor combination levels to define subgruops, defaults to 3}
 
@@ -41,11 +33,13 @@ subscreencalc(
 
 \item{par_functions}{vector of names of functions used in eval_function to be exported to cluster (needed only if nkernel > 1)}
 
-\item{verbose}{switch on/off output of computational information}
+\item{verbose}{logical value to switch on/off output of computational information (defaults to TRUE)}
 
-\item{factorial}{switch on/off calculation of factorial contexts}
+\item{factorial}{logical value to switch on/off calculation of factorial contexts (defaults to FALSE)}
 
-\item{use_complement}{switch on/off calculation of complement subgroups}
+\item{use_complement}{logical value to switch on/off calculation of complement subgroups (defaults to FALSE)}
+
+\item{...}{further parameters which where outdated used for notes and errors.}
 }
 \value{
 an object of type SubScreenResult of the form
@@ -53,7 +47,6 @@ list(sge=H,
      max_comb=max_comb,
      min_comb=min_comb,
      subjectid=subjectid,
-     endpoints=endpoints,
      treat=treat,
      factors=factors,
      results_total=eval_function(cbind(F,T)))
@@ -95,13 +88,6 @@ pbc$cholg[!is.na(pbc$chol)]      <-
    ifelse(pbc$chol[!is.na(pbc$chol)]        <= median(pbc$chol,    na.rm=TRUE), "Low", "High")
 pbc$copperg[!is.na(pbc$copper)]  <-
    ifelse(pbc$copper[!is.na(pbc$copper)]    <= median(pbc$copper,  na.rm=TRUE), "Low", "High")
-pbc$ageg[is.na(pbc$age)]         <- "No Data"
-pbc$albuming[is.na(pbc$albumin)] <- "No Data"
-pbc$phosg[is.na(pbc$alk.phos)]   <- "No Data"
-pbc$astg[is.na(pbc$ast)]         <- "No Data"
-pbc$bilig[is.na(pbc$bili)]       <- "No Data"
-pbc$cholg[is.na(pbc$chol)]       <- "No Data"
-pbc$copperg[is.na(pbc$copper)]   <- "No Data"
 #eliminate treatment NAs
 pbcdat <- pbc[!is.na(pbc$trt), ]
 # PFS and OS endpoints
@@ -138,17 +124,18 @@ hazardratio <- function(D) {
  # run subscreen
 
 \dontrun{
-results <- subscreencalc(data=pbcdat,
-                     eval_function=hazardratio,
-                     endpoints = c("timepfs" , "event.pfs", "timeos", "event.os"),
-                     treat="trt",
-                     subjectid = "id",
-                     factors=c("ageg", "sex", "bilig", "cholg", "copperg"),
-                     use_complement = FALSE,
-                     factorial = FALSE)
+results <- subscreencalc(
+  data=pbcdat,
+  eval_function=hazardratio,
+  subjectid = "id",
+  factors=c("ageg", "sex", "bilig", "cholg", "copperg"),
+  use_complement = FALSE,
+  factorial = FALSE
+)
 
 # visualize the results of the subgroup screening with a Shiny app
-subscreenshow(results)}
+subscreenshow(results)
+}
 }
 \keyword{analysis}
 \keyword{subgroup}

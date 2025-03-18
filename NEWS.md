@@ -140,7 +140,45 @@
 ## subscreencalc
 * supress output of "joining by ..." while running R version 3.X.X
 
-## subscreen 3.0.7
-* Remove R Package RandomForestSRC and use R Package ranger for random forest calculation in 
-function subscreenvi 
-* Change example in subscreenvi
+# subscreen 4.0.0
+
+## subscreencalc
+* parameter min_comb removed
+* parameter endpoints removed
+* bug fix subscreencalc factorial context calculation
+* new factorial context calculation for each target variable
+* multiple notes and custom error messages added
+* parameter factors is now required
+
+## subscreenshow
+* new upload-tab in app
+* re-sturcture app via modules
+* add memorize subgroup labels
+* add memorize subgroup color
+* complete change of ASMUS-tab
+* new hover and click feature in explorer- and comparer-tab
+* legend collapsable in explorer-tab
+* new feature x-axis slider
+* new feature custom reference line
+* new parameter favour_label_verum_name & favour_label_comparator_name
+  in subscreenshow() for new feature of custom labels in explorer- and
+  comparer-tab 
+* second filter variable applicable in explorer-tab
+* new header information in explorer-tab
+* plotting character option removed
+* bug fix mosaic plot number of subjects size
+
+
+## additional changes
+* update example/demo data and include them within app
+* new vignette/readme
+* changes in DESCRIPTION
+
+# subscreen 4.0.1
+
+## Bug fix non-availability of createColorVector()
+* function createColorVector() included
+
+
+
+

@@ -5,23 +5,36 @@
 \title{(ii) Visualization}
 \usage{
 subscreenshow(
-  scresults,
+  scresults = NULL,
   variable_importance = NULL,
   host = NULL,
   port = NULL,
-  NiceNumbers = c(1, 1.5, 2, 4, 5, 6, 8, 10)
+  NiceNumbers = c(1, 1.5, 2, 4, 5, 6, 8, 10),
+  windowTitle = "Subgroup Explorer",
+  graphSubtitle = NULL,
+  favour_label_verum_name = NULL,
+  favour_label_comparator_name = NULL
 )
 }
 \arguments{
 \item{scresults}{SubScreenResult object with results from a subscreencalc call}
 
-\item{variable_importance}{add description}
+\item{variable_importance}{variable importance object calculated via subscreenvi to unlock
+'variable importance'-tab in the app}
 
 \item{host}{host name or IP address for Shiny display}
 
 \item{port}{port number for Shiny display}
 
 \item{NiceNumbers}{list of numbers used for a 'nice' scale}
+
+\item{windowTitle}{title which is shown for the browser tab}
+
+\item{graphSubtitle}{subtitle for explorer plot}
+
+\item{favour_label_verum_name}{verum name for label use in explorer graph}
+
+\item{favour_label_comparator_name}{comparator name for label use in explorer graph}
 }
 \description{
 Start the Shiny based interactive visualization tool to show the subgroup results
